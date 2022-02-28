@@ -346,6 +346,12 @@ class Widget(QWidget):
         self.setLayout(mainLay)
 
     def getFullLibs(self):
+        if not os.path.exists(TARGET_PLIST_DIR):
+           os.makedirs(TARGET_PLIST_DIR)
+
+        if not os.path.exists(TARGET_XML_DIR):
+           os.makedirs(TARGET_XML_DIR)
+
         list=list_all_files(TARGET_XML_DIR)
         for fullname in list:  # 循环读取每一行，1：是从第二行开始
             if ".xml" in fullname:
