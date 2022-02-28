@@ -139,7 +139,7 @@ class PWidget(QWidget):
             if not os.path.exists(self.wle.text()):
                 src=os.fspath(Path(__file__).resolve().parent /"src/wallpaper.png")
                 img=QImage(src)
-                img.scaled(450, 100).save(outPic)
+                img.scaled(382, 100).save(outPic)
             else:
                 img=QImage(self.wle.text())
-                img.scaled(450,100).save(outPic)
+                img.scaled(382,100).save(outPic)

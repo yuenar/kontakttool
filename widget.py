@@ -17,6 +17,7 @@ from PySide6.QtCore import QSize, Signal as pyqtSignal
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QPushButton, \
         QListWidgetItem, QVBoxLayout, QListWidget, QApplication
 
+import applescript
 
 class ItemWidget(QWidget):
     itemDeleted = pyqtSignal(QListWidgetItem)
@@ -227,7 +228,7 @@ def judge_ktxml(apath):
 class Widget(QWidget):
     def __init__(self):
         QWidget.__init__(self)
-        self.setWindowTitle("康泰克助手Kontakt Tool by OwenZhang张礼乐")
+        self.setWindowTitle("康泰克助手Kontakt Tool by OwenZhang张礼乐 Intel Cpu")
         self.dialog = QFileDialog()
         self.list=[]
         self.setupUi()
@@ -391,6 +392,20 @@ class Widget(QWidget):
         self.add2listView(xml)
 
 if __name__ == "__main__":
+    if os.geteuid() != 0:
+        # print("This program must be run as root. Aborting.")
+        # cmd = os.fspath(Path(__file__).resolve().parent / "src/run.sh")
+        # os.system(cmd)
+        # os.system("open -a Terminal .")
+        applescript.AppleScript('display dialog "程序需要输入用户密码，App need input user password." giving up after 2').run()
+        applescript.AppleScript('''tell application "Terminal"
+                                        activate
+	                                    set newTab to do script "sudo /Applications/kontakt-tool.app/Contents/MacOS/kontakt-tool"
+                                     end tell
+                                '''
+                                ).run()
+        sys.exit(-1)
+
     app = QApplication([])
     app.setStyleSheet(StyleSheet)
     window = Widget()
