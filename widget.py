@@ -10,6 +10,7 @@ from PySide6.QtCore import QUrl
 from PySide6.QtWidgets import QMessageBox,QFileDialog
 from biplist import *
 import xmltodict
+import bs4
 from pwidget import PWidget
 from pathlib import Path
 
@@ -215,15 +216,21 @@ def judge_ktxml(apath):
         return
 
     f = open(apath, "r", encoding="UTF-8")
-
-
     adata = f.read()
 
-    d = xmltodict.parse(adata)
-    if "Plugin" in d["ProductHints"]["Product"]["Type"]:
-        return ""
-    else:
+    d = bs4.BeautifulSoup(adata , 'xml')
+    # print(d.Type)
+
+    if "Content" in str(d.Type):
         return baseName.replace(".xml" , "")
+    else:
+        return ""
+
+    # d = xmltodict.parse(adata)
+    # if "Plugin" in d["ProductHints"]["Product"]["Type"]:
+    #     return ""
+    # else:
+    #     return baseName.replace(".xml" , "")
 
 class Widget(QWidget):
     def __init__(self):
@@ -415,6 +422,8 @@ if __name__ == "__main__":
     app = QApplication([])
     app.setStyleSheet(StyleSheet)
     window = Widget()
+    # print(judge_ktxml("/Library/Application Support/Native Instruments/Service Center/ANALOG BRASS AND WINDS.xml"))
+
     window.show()
     # window.test()
     # window.getFullLibs()
