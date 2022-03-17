@@ -75,7 +75,7 @@ QListView {
 }
 
 #listWidget::item:selected {
-    border-left: 5px solid #ff9800;
+    border-left: 5px solid #5B6164;
 }
 QPushButton {
     border: none; /*去掉边框*/
@@ -452,7 +452,7 @@ class Widget(QWidget):
 
 if __name__ == "__main__":
     if os.geteuid() != 0:
-        print("This program must be run as root.Or aborting.")
+        # print("This program must be run as root.Or aborting.")
         # cmd = os.fspath(Path(__file__).resolve().parent / "src/run.sh")
         # os.system(cmd)
         # os.system("open -a Terminal .")
