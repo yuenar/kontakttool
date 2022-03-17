@@ -308,7 +308,6 @@ class Widget(QWidget):
             return
 
         msgBox = QMessageBox(self)
-
         msgBox.resize(360,240)
         msgBox.setWindowTitle('警告Warning')
         msgBox.setIcon(QMessageBox.Warning)
