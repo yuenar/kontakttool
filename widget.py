@@ -5,9 +5,9 @@ import sys , os
 
 import re
 import stat
-from PySide6.QtGui import QDesktopServices,QPixmap
+from PySide6.QtGui import QDesktopServices,QPixmap,QImage
 from PySide6.QtCore import QUrl
-from PySide6.QtWidgets import QMessageBox,QFileDialog
+from PySide6.QtWidgets import QMessageBox,QFileDialog,QLabel
 from biplist import *
 import xmltodict
 import bs4
@@ -26,22 +26,61 @@ class ItemWidget(QWidget):
     def __init__(self, text, item, *args, **kwargs):
         super(ItemWidget, self).__init__(*args, **kwargs)
         self._item = item  # 保留list item的对象引用
+        self.setObjectName("IWidget")
+
         layout = QHBoxLayout(self)
+        # self.setFixedSize(QSize(380, 50))
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.addWidget(QLineEdit(text, self))
-        layout.addWidget(QPushButton('x', self, clicked=self.doDeleteItem))
+        line=QLineEdit(text, self)
+        line.setFixedSize(QSize(340, 40))
+        line.setReadOnly(True)
+        layout.addWidget(line)
+        btn=QPushButton('X ', self, clicked=self.doDeleteItem)
+        btn.setFixedSize(QSize(40, 40))
+        layout.addWidget(btn)
 
     def doDeleteItem(self):
         self.itemDeleted.emit(self._item)
 
     def sizeHint(self):
         # 决定item的高度
-        return QSize(200, 40)
+        return QSize(200, 50)
 
 StyleSheet = """
 /*这里是通用设置，所有按钮都有效，不过后面的可以覆盖这个*/
+QLineEdit {
+    border: transparent;
+    color: #030303;
+    background-color: #CBD1D5;
+}
+QLabel{
+    outline: none;
+    color:#292421;
+}
+
+QListView {
+    outline: none;
+}
+
+#listWidget::item {
+    background-color: #ffffff;
+    color: #000000;
+    border: transparent;
+    border-bottom: 1px solid #dbdbdb;
+    padding: 8px;
+}
+
+#listWidget::item:hover {
+    background-color: #f5f5f5;
+}
+
+#listWidget::item:selected {
+    border-left: 5px solid #ff9800;
+}
 QPushButton {
     border: none; /*去掉边框*/
+    background-color: #CBD1D5;
+    color:#FFFAFA;
 }
 /*
 QPushButton#xxx
@@ -59,15 +98,19 @@ QPushButton#RedButton {
 #RedButton:pressed {
     background-color: #ffcdd2; /*鼠标按下不放时背景颜色*/
 }
+QPushButton:pressed {
+    background-color: #5B6164;
+}
 #GreenButton {
-    background-color: #4caf50;
+    background-color: #5B6164;
     border-radius: 5px; /*圆角*/
 }
 #GreenButton:hover {
-    background-color: #81c784;
+    background-color: #CBD2D2;
+    color:#292421;
 }
 #GreenButton:pressed {
-    background-color: #c8e6c9;
+    background-color: #CAD1D5;
 }
 #BlueButton {
     background-color: #2196f3;
@@ -88,13 +131,14 @@ QPushButton#RedButton {
     max-height: 48px;
     border-top-right-radius: 20px; /*右上角圆角*/
     border-bottom-left-radius: 20px; /*左下角圆角*/
-    background-color: #ff9800;
+    background-color: #5B6164;
 }
 #OrangeButton:hover {
-    background-color: #ffb74d;
+    background-color: #CBD2D2;
+    color:#292421;
 }
 #OrangeButton:pressed {
-    background-color: #ffe0b2;
+    background-color: #CAD1D5;
 }
 /*根据文字内容来区分按钮,同理还可以根据其它属性来区分*/
 QPushButton[text="purple button"] {
@@ -374,7 +418,10 @@ class Widget(QWidget):
             return
 
         item = QListWidgetItem(self.listWidget)
-        widget = ItemWidget('已导入Exist:    {}'.format(n), item, self.listWidget)
+        item.setSizeHint(QSize(380, 42))
+        # widget = ItemWidget('已导入Exist:    {}'.format(n), item, self.listWidget)
+        widget = ItemWidget('   {}'.format(n), item, self.listWidget)
+        widget.setFixedSize(QSize(380, 42))
         # 绑定删除信号
         widget.itemDeleted.connect(self.doDeleteItem)
         self.listWidget.setItemWidget(item, widget)
@@ -405,26 +452,28 @@ class Widget(QWidget):
         self.add2listView(xml)
 
 if __name__ == "__main__":
-    if os.geteuid() != 0:
-        # print("This program must be run as root. Aborting.")
-        # cmd = os.fspath(Path(__file__).resolve().parent / "src/run.sh")
-        # os.system(cmd)
-        # os.system("open -a Terminal .")
-        applescript.AppleScript('display dialog "程序需要输入用户密码，App need input user password." giving up after 2').run()
-        applescript.AppleScript('''tell application "Terminal"
-                                        activate
-	                                    set newTab to do script "sudo /Applications/kontakt-tool.app/Contents/MacOS/kontakt-tool"
-                                     end tell
-                                '''
-                                ).run()
-        sys.exit(-1)
+    # if os.geteuid() != 0:
+    #     # print("This program must be run as root. Aborting.")
+    #     # cmd = os.fspath(Path(__file__).resolve().parent / "src/run.sh")
+    #     # os.system(cmd)
+    #     # os.system("open -a Terminal .")
+    #     applescript.AppleScript('display dialog "程序需要输入用户密码，App need input user password." giving up after 2').run()
+    #     applescript.AppleScript('''tell application "Terminal"
+    #                                     activate
+	#                                     set newTab to do script "sudo /Applications/kontakt-tool.app/Contents/MacOS/kontakt-tool"
+    #                                  end tell
+    #                             '''
+    #                             ).run()
+    #     sys.exit(-1)
 
     app = QApplication([])
+    window=QWidget()
     app.setStyleSheet(StyleSheet)
     window = Widget()
     # print(judge_ktxml("/Library/Application Support/Native Instruments/Service Center/ANALOG BRASS AND WINDS.xml"))
 
     window.show()
+
     # window.test()
     # window.getFullLibs()
     # window.open_ni_dir()
