@@ -451,19 +451,19 @@ class Widget(QWidget):
         self.add2listView(xml)
 
 if __name__ == "__main__":
-    # if os.geteuid() != 0:
-    #     # print("This program must be run as root. Aborting.")
-    #     # cmd = os.fspath(Path(__file__).resolve().parent / "src/run.sh")
-    #     # os.system(cmd)
-    #     # os.system("open -a Terminal .")
-    #     applescript.AppleScript('display dialog "程序需要输入用户密码，App need input user password." giving up after 2').run()
-    #     applescript.AppleScript('''tell application "Terminal"
-    #                                     activate
-	#                                     set newTab to do script "sudo /Applications/kontakt-tool.app/Contents/MacOS/kontakt-tool"
-    #                                  end tell
-    #                             '''
-    #                             ).run()
-    #     sys.exit(-1)
+    if os.geteuid() != 0:
+        # print("This program must be run as root. Aborting.")
+        # cmd = os.fspath(Path(__file__).resolve().parent / "src/run.sh")
+        # os.system(cmd)
+        # os.system("open -a Terminal .")
+        applescript.AppleScript('display dialog "程序需要输入用户密码，App need input user password." giving up after 2').run()
+        applescript.AppleScript('''tell application "Terminal"
+                                        activate
+	                                    set newTab to do script "sudo /Applications/kontakt-tool.app/Contents/MacOS/kontakt-tool"
+                                     end tell
+                                '''
+                                ).run()
+        sys.exit(-1)
 
     app = QApplication([])
     window=QWidget()
