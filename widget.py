@@ -360,12 +360,19 @@ def judge_ktxml(apath):
     f = open(p, "r", encoding="UTF-8")
     adata = f.read()
 
-    d = bs4.BeautifulSoup(adata, 'xml')
-
-    if "Content" in str(d.Type):
-        return baseName.replace(".xml", "")
+    if isWindows:
+        d = xmltodict.parse(adata)
+        if "Plugin" in d["ProductHints"]["Product"]["Type"]:
+            return ""
+        else:
+            return baseName.replace(".xml" , "")
     else:
-        return ""
+        d = bs4.BeautifulSoup(adata, 'xml')
+
+        if "Content" in str(d.Type):
+            return baseName.replace(".xml", "")
+        else:
+            return ""
 
 
 class Widget(QWidget):
@@ -647,8 +654,8 @@ if __name__ == "__main__":
     # print(platform.python_compiler())
 
 
-    # elevate(show_console=False)
-    elevate()
+    elevate(show_console=False)
+    # elevate()
 
 
     # if isWindows:
