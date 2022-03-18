@@ -8,7 +8,6 @@ import stat
 import sys
 from pathlib import Path
 from winreg import *
-
 import bs4
 import xmltodict
 from PySide6.QtCore import QSize, Signal as pyqtSignal
@@ -385,7 +384,6 @@ class Widget(QWidget):
 
         # dpi = screen.logicalDotsPerInch() * screen.devicePixelRatio()
         # density = dpi / 160.0
-        # print(density)
 
         # self.resize(800*density, 600*density)
         # self.setMinimumSize(800,600)
