@@ -1,24 +1,36 @@
 # This Python file uses the following encoding: utf-8
 # -*- coding: utf-8 -*-
 
-import sys , os
-
+import os
+import platform
 import re
 import stat
-from PySide6.QtGui import QDesktopServices,QPixmap,QImage,QGuiApplication
-from PySide6.QtCore import QUrl
-from PySide6.QtWidgets import QMessageBox,QFileDialog,QLabel
-from biplist import *
-import xmltodict
-import bs4
-from pwidget import PWidget
+import sys
 from pathlib import Path
+from winreg import *
 
+import bs4
+import xmltodict
 from PySide6.QtCore import QSize, Signal as pyqtSignal
+from PySide6.QtCore import QUrl
+from PySide6.QtGui import QDesktopServices, QPixmap
+from PySide6.QtWidgets import QMessageBox, QFileDialog
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QPushButton, \
-        QListWidgetItem, QVBoxLayout, QListWidget, QApplication
+    QListWidgetItem, QVBoxLayout, QListWidget, QApplication
+from biplist import *
+from elevate import elevate
 
-import applescript
+from pwidget import PWidget
+
+isWindows= False
+cpuType="Intel"
+
+# 1.连接注册表根键，以HKEY_LOCAL_MACHINE为例
+regRoot = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
+regUser = ConnectRegistry(None, HKEY_CURRENT_USER)
+
+
+# 2.获取指定目录下所有键的控制(可用于遍历)
 
 class ItemWidget(QWidget):
     itemDeleted = pyqtSignal(QListWidgetItem)
@@ -147,9 +159,11 @@ QPushButton[text="purple button"] {
 }
 """
 
-TARGET_XML_DIR = "/Library/Application Support/Native Instruments/Service Center"
+TARGET_XML_DIR = ""
 TARGET_PLIST_DIR = "/Library/Preferences"
-
+subDir = r'SOFTWARE\Native Instruments'
+TARGET_MAC_XML_DIR = "/Library/Application Support/Native Instruments/Service Center"
+TARGET_WIN_XML_DIR = "C:\\Program Files\\Common Files\\Native Instruments\\Service Center"
 # TARGET_PLIST_DIR = "/Volumes/misc/test/Preferences"
 # TARGET_XML_DIR = "/Volumes/misc/test/Service Center"
 
@@ -192,6 +206,7 @@ def parse_ncint(path):
     f = open(path, "r", encoding="ISO-8859-1")
     baseName=os.path.basename(path)
     libName=baseName.replace(".nicnt", ".")
+    rName=baseName.replace(".nicnt", "")
 
     lines = f.readlines()  # 读取全部内容 ，并以列表方式返回
     newXML='<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n'
@@ -230,8 +245,87 @@ def parse_ncint(path):
     else:
         upid=''
 
-    create_plist(d["ProductHints"]["Product"]['Name'], d["ProductHints"]["Product"]['RegKey'], hu, upid, spath,jdx, d["ProductHints"]["Product"]['SNPID'])
+    if isWindows:
+        create_reg(rName, hu, upid, spath,jdx)
+    else:
+        create_plist(libName, libName, hu, upid, spath,jdx, d["ProductHints"]["Product"]['SNPID'])
     return full_new_xml
+
+
+def create_reg(libName, HU,UPID,path,JDX):
+    if len(libName)<1:
+        return
+
+    front=path.split("::")[0]
+    back=path.split("::")[1]
+    p=front+":\\"+back.replace(":","\\")
+    # keyHandle = OpenKey(regRoot, subDir)
+    keyHandle = OpenKey(HKEY_LOCAL_MACHINE, subDir)
+    shellkey = CreateKey(keyHandle, str(libName))
+
+    subDir_2 = r'%s\%s' % (subDir, libName)
+    key = OpenKey(HKEY_LOCAL_MACHINE, subDir_2, 0, KEY_WRITE)
+    SetValueEx(key, "ContentDir", 0, REG_SZ, p)
+    SetValueEx(key, "ContentVersion", 0, REG_SZ, "1.0.0")
+    SetValueEx(key, "HU", 0, REG_SZ, HU)
+    SetValueEx(key, "JDX", 0, REG_SZ, JDX)
+    SetValueEx(key, "UPID", 0, REG_SZ, UPID)
+    SetValueEx(key, "Visibility", 0, REG_DWORD, 3)
+    CloseKey(key)
+    CloseKey(shellkey)
+    CloseKey(keyHandle)
+
+def deleteSubkey(key0, key1, key2=""):
+    if key2=="":
+        currentkey = key1
+    else:
+        currentkey = key1+ "\\" +key2
+
+    open_key = OpenKey(key0, currentkey, 0, KEY_ALL_ACCESS)
+    infokey = QueryInfoKey(open_key)
+    for x in range(0, infokey[0]):
+        #NOTE:: This code is to delete the key and all subkeys.
+        #  If you just want to walk through them, then 
+        #  you should pass x to EnumKey. subkey = EnumKey(open_key, x)
+        #  Deleting the subkey will change the SubKey count used by EnumKey. 
+        #  We must always pass 0 to EnumKey so we 
+        #  always get back the new first SubKey.
+        subkey = EnumKey(open_key, 0)
+        try:
+            DeleteKey(open_key, subkey)
+            print("Removed %s\\%s " % (currentkey, subkey))
+        except:
+            deleteSubkey( key0, currentkey, subkey )
+            # no extra delete here since each call 
+            #to deleteSubkey will try to delete itself when its empty.
+
+    DeleteKey(open_key,"")
+    open_key.Close()
+    print("Removed %s" % (currentkey))
+    return
+
+
+def delete_reg(libName):
+    if len(libName)<1:
+        return
+
+    Parentkey = OpenKey(HKEY_LOCAL_MACHINE, subDir, 0, KEY_ALL_ACCESS)
+
+    try:
+        deleteSubkey(Parentkey, libName, '')
+    except Exception as e:
+        print(e)
+
+
+    uParentkey = OpenKey(HKEY_CURRENT_USER, subDir, 0, KEY_ALL_ACCESS)
+    try:
+        deleteSubkey(uParentkey, libName, '')
+    except Exception as e:
+        print(e)
+
+    CloseKey(Parentkey)
+    CloseKey(uParentkey)
+
 
 def create_plist(libName, RegKey, HU,UPID,path,JDX, snpid):
     f = "com.native-instruments."+libName+".plist"
@@ -252,47 +346,64 @@ def create_plist(libName, RegKey, HU,UPID,path,JDX, snpid):
 
 def judge_ktxml(apath):
     if not os.path.isfile(apath):
-        return
+        return ""
 
-    # print(apath)
+    if "NativeAccess" in apath:
+        return ""
+
     baseName = os.path.basename(apath)
     if(len(baseName)<5):
         return
 
-    f = open(apath, "r", encoding="UTF-8")
+
+    p = apath.replace("\\", "/")
+    f = open(p, "r", encoding="UTF-8")
     adata = f.read()
 
-    d = bs4.BeautifulSoup(adata , 'xml')
-    # print(d.Type)
+    d = bs4.BeautifulSoup(adata, 'xml')
 
     if "Content" in str(d.Type):
-        return baseName.replace(".xml" , "")
+        return baseName.replace(".xml", "")
     else:
         return ""
 
-    # d = xmltodict.parse(adata)
-    # if "Plugin" in d["ProductHints"]["Product"]["Type"]:
-    #     return ""
-    # else:
-    #     return baseName.replace(".xml" , "")
 
 class Widget(QWidget):
     def __init__(self):
         QWidget.__init__(self)
-        self.setWindowTitle("康泰克助手Kontakt Tool by OwenZhang张礼乐 Intel Cpu")
+        self.setWindowTitle("康泰克助手Kontakt Tool by OwenZhang张礼乐    {}".format(cpuType))
         self.dialog = QFileDialog()
         self.list=[]
         self.setupUi()
 
-        dpi = screen.logicalDotsPerInch() * screen.devicePixelRatio()
-        density = dpi / 160.0
+        # dpi = screen.logicalDotsPerInch() * screen.devicePixelRatio()
+        # density = dpi / 160.0
         # print(density)
 
-        self.resize(800*density, 600*density)
+        # self.resize(800*density, 600*density)
+        # self.setMinimumSize(800,600)
+        # self.setMaximumSize(800*density,600*density)
+
+        self.resize(800, 600)
         self.setMinimumSize(800,600)
-        self.setMaximumSize(800*density,600*density)
-        self.update()
+        self.setMaximumSize(800,600)
+
         self.getFullLibs()
+    #     # 鼠标移动
+    # def mouseMoveEvent(self, event):
+    #     if event.buttons() == Qt.LeftButton and self._mouse_pos:
+    #         self.parent().move(self.mapToGlobal(event.pos() - self._mouse_pos))
+    #     event.accept()  # 接受事件,不传递到父控件
+    #
+    # def mousePressEvent(self, event):
+    #     if event.button() == Qt.LeftButton:
+    #         self._mouse_pos = event.pos()
+    #     event.accept()  # 接受事件,不传递到父控件
+    #
+    # def mouseReleaseEvent(self, event):
+    #     self._mouse_pos = None
+    #     event.accept()  # 接受事件,不传递到父控件
+
 
     def doDeleteItem(self, item):
         # 根据item得到它对应的行数
@@ -300,10 +411,20 @@ class Widget(QWidget):
         # 删除item
 
         name=self.list[row]
-        os.remove(name)
-        # print("del:"+name)
-        del self.list[row]
         item = self.listWidget.takeItem(row)
+
+        realname = item.text()
+        if (realname in name):
+            print("del WENJIAN:" + name)
+            os.remove(name)
+
+        if len(realname)<1:
+            baseName=os.path.basename(name)
+            realname=baseName.replace(".xml","")
+
+        print("del ReG:" + realname)
+        delete_reg(realname)
+        del self.list[row]
         # 删除widget
         self.listWidget.removeItemWidget(item)
         del item
@@ -319,7 +440,7 @@ class Widget(QWidget):
         msgBox.setText("是否清空所有入库音色？操作不可还原！Clear all banked tones? The operation is irreversible!")
         okButton = msgBox.addButton(self.tr("确定Go on"), QMessageBox.ActionRole)
         okButton.clicked.connect(self.realClear)
-        msgBox.exec_()
+        msgBox.exec()
 
     def realClear(self):
         # 清空所有Item
@@ -327,14 +448,28 @@ class Widget(QWidget):
             # 删除item
             # 一直是0的原因是一直从第一行删,删掉第一行后第二行变成了第一行
             # 这个和删除list [] 里的数据是一个道理
+
             item = self.listWidget.takeItem(0)
             name = self.list[0]
-            del self.list[0]
-            os.remove(name)
+            realname = item.text()
+
+
+            if(realname in name):
+                print("del WENJIAN:" + name)
+                os.remove(name)
+
+            if len(realname) < 1:
+                baseName = os.path.basename(name)
+                realname = baseName.replace(".xml", "")
+            print("del ReG:" + realname)
+            delete_reg(realname)
+
             # 删除widget
             self.listWidget.removeItemWidget(item)
             del item
+            del self.list[0]
 
+        self.listWidget.clear()
         self.list.clear()
 
     def doEmail(self):
@@ -401,16 +536,45 @@ class Widget(QWidget):
         self.setLayout(mainLay)
 
     def getFullLibs(self):
-        if not os.path.exists(TARGET_PLIST_DIR):
-           os.makedirs(TARGET_PLIST_DIR)
 
-        if not os.path.exists(TARGET_XML_DIR):
-           os.makedirs(TARGET_XML_DIR)
+        if isWindows:
 
-        list=list_all_files(TARGET_XML_DIR)
-        for fullname in list:  # 循环读取每一行，1：是从第二行开始
-            if ".xml" in fullname:
-                self.add2listView(fullname)
+            keyHandle = OpenKey(HKEY_LOCAL_MACHINE, subDir)
+            count = QueryInfoKey(keyHandle)[0]  # 获取该目录下所有键的个数(0-下属键个数;1-当前键值个数)
+            for i in range(count):
+                # 3.穷举每个键，获取键名
+                subKeyName = EnumKey(keyHandle, i)
+
+                if "Kontakt Application" not in subKeyName:
+                    # print(subKeyName)
+
+                    subDir_2 = r'%s\%s' % (subDir, subKeyName)
+                    # 4.根据获取的键名拼接之前的路径作为参数，获取当前键下所属键的控制
+                    keyHandle_2 = OpenKey(regRoot, subDir_2)
+                    # count2 = QueryInfoKey(keyHandle_2)[1]
+                    # for j in range(count2):
+                    #     # 5.穷举每个键，获取键名、键值以及数据类型
+                    # name, value, type = EnumValue(keyHandle_2, 0)
+                    aname=TARGET_WIN_XML_DIR+"\\"+subKeyName+".xml"
+                    fullname=aname.replace("\\","/")
+                    self.add2listView(fullname)
+                    print(fullname)
+                    CloseKey(keyHandle_2)  # 读写操作结束后关闭键
+            CloseKey(keyHandle)
+
+        else:
+            if not os.path.exists(TARGET_PLIST_DIR):
+               os.makedirs(TARGET_PLIST_DIR)
+
+            if not os.path.exists(TARGET_XML_DIR):
+               os.makedirs(TARGET_XML_DIR)
+
+            list=list_all_files(TARGET_XML_DIR)
+            for fullname in list:  # 循环读取每一行，1：是从第二行开始
+                if ".xml" in fullname:
+                    self.add2listView(fullname)
+
+
 
         # print(self.list)
     def add2listView(self,fullname):
@@ -424,7 +588,7 @@ class Widget(QWidget):
         item = QListWidgetItem(self.listWidget)
         item.setSizeHint(QSize(380, 42))
         # widget = ItemWidget('已导入Exist:    {}'.format(n), item, self.listWidget)
-        widget = ItemWidget('   {}'.format(n), item, self.listWidget)
+        widget = ItemWidget('{}'.format(n), item, self.listWidget)
         widget.setFixedSize(QSize(380, 42))
         # 绑定删除信号
         widget.itemDeleted.connect(self.doDeleteItem)
@@ -456,33 +620,97 @@ class Widget(QWidget):
         self.add2listView(xml)
 
 if __name__ == "__main__":
-    # if os.geteuid() != 0:
-    #     # print("This program must be run as root.Or aborting.")
-    #     # cmd = os.fspath(Path(__file__).resolve().parent / "src/run.sh")
-    #     # os.system(cmd)
-    #     # os.system("open -a Terminal .")
-    #     applescript.AppleScript('display dialog "程序需要输入用户密码，App need input user password." giving up after 2').run()
-    #     applescript.AppleScript('''tell application "Terminal"
-    #                                     activate
-	#                                     set newTab to do script "sudo /Applications/kontakt-tool.app/Contents/MacOS/kontakt-tool"
-    #                                  end tell
-    #                             '''
-    #                             ).run()
-    #     sys.exit(-1)
 
-    # QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
+    #   获取操作系统可执行程序的结构，，(’32bit’, ‘WindowsPE’)
+    if "Windows" in str(platform.architecture()):
+        isWindows = True
+        print(platform.architecture())
+        TARGET_XML_DIR=TARGET_WIN_XML_DIR
+    else:
+        isWindows = False
+        print(platform.architecture())
+        TARGET_XML_DIR=TARGET_MAC_XML_DIR
+
+    # #   计算机的网络名称，’acer-PC’
+    # print(platform.node())
+    #
+    # # 获取操作系统名称及版本号，’Windows-7-6.1.7601-SP1′
+    # print(platform.platform())
+
+    # 计算机处理器信息，’Intel64 Family 6 Model 42 Stepping 7, GenuineIntel’
+    cpuType=platform.processor().split(" ")[0]
+
+    # # 获取操作系统中Python的构建日期
+    # print(platform.python_build())
+    #
+    # #  获取系统中python解释器的信息
+    # print(platform.python_compiler())
+
+
+    elevate(show_console=False)
+    # elevate()
+
+
+    # if isWindows:
+    #     if sys.argv[-1] != ASADMIN:
+    #         script = os.path.abspath(sys.argv[0])
+    #         params = ' '.join([script] + sys.argv[1:] + [ASADMIN])
+    #         shell.ShellExecuteEx(lpVerb='runas', lpFile=sys.executable, lpParameters=params)
+    #         sys.exit(0)
+    #
+    #     else:
+    #         app = QApplication([])
+    #         window = QWidget()
+    #         screen = QApplication.primaryScreen()
+    #
+    #         app.setStyleSheet(StyleSheet)
+    #         window = Widget()
+    #         # window.setScale(density)
+    #         # print(judge_ktxml("/Library/Application Support/Native Instruments/Service Center/ANALOG BRASS AND WINDS.xml"))
+    #
+    #         window.show()
+    #
+    #         # window.test()
+    #         # window.getFullLibs()
+    #         # window.open_ni_dir()
+    #         sys.exit(app.exec())
+    #     # else:
+    #     #     # Re-run the program with admin rights
+    #     #     ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, __file__, None, 1)
+    # else:
+    #     if os.geteuid() != 0:
+    #         # print("This program must be run as root.Or aborting.")
+    #         # cmd = os.fspath(Path(__file__).resolve().parent / "src/run.sh")
+    #         # os.system(cmd)
+    #         # os.system("open -a Terminal .")
+    #         applescript.AppleScript('display dialog "程序需要输入用户密码，App need input user password." giving up after 2').run()
+    #         applescript.AppleScript('''tell application "Terminal"
+    #                                         activate
+    #                                         set newTab to do script "sudo /Applications/kontakt-tool.app/Contents/MacOS/kontakt-tool"
+    #                                      end tell
+    #                                 '''
+    #                                 ).run()
+    #         sys.exit(-1)
+    #     else:
+
+    akeyHandle = CreateKey(HKEY_LOCAL_MACHINE, subDir)
+    akey1Handle = CreateKey(HKEY_CURRENT_USER, subDir)
+    CloseKey(akeyHandle)
+    CloseKey(akey1Handle)
+
     app = QApplication([])
-    window=QWidget()
+    window = QWidget()
     screen = QApplication.primaryScreen()
 
     app.setStyleSheet(StyleSheet)
     window = Widget()
-    # window.setScale(density)
-    # print(judge_ktxml("/Library/Application Support/Native Instruments/Service Center/ANALOG BRASS AND WINDS.xml"))
 
     window.show()
-
+    window.move((1920-1080)*0.5,100)
     # window.test()
     # window.getFullLibs()
     # window.open_ni_dir()
     sys.exit(app.exec())
+
+
+
