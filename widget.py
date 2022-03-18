@@ -647,8 +647,8 @@ if __name__ == "__main__":
     # print(platform.python_compiler())
 
 
-    elevate(show_console=False)
-    # elevate()
+    # elevate(show_console=False)
+    elevate()
 
 
     # if isWindows:
