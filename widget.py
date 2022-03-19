@@ -7,7 +7,7 @@ import re
 import stat
 import sys
 from pathlib import Path
-from winreg import *
+
 import bs4
 import xmltodict
 from PySide6.QtCore import QSize, Signal as pyqtSignal
@@ -17,16 +17,19 @@ from PySide6.QtWidgets import QMessageBox, QFileDialog
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QPushButton, \
     QListWidgetItem, QVBoxLayout, QListWidget, QApplication
 from biplist import *
+import webbrowser
 from elevate import elevate
-
 from pwidget import PWidget
+import applescript
 
 isWindows= False
 cpuType="Intel"
+osType="Mac"
 
-# 1.连接注册表根键，以HKEY_LOCAL_MACHINE为例
-regRoot = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
-regUser = ConnectRegistry(None, HKEY_CURRENT_USER)
+# from winreg import *
+# # 1.连接注册表根键，以HKEY_LOCAL_MACHINE为例
+# regRoot = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
+# regUser = ConnectRegistry(None, HKEY_CURRENT_USER)
 
 
 # 2.获取指定目录下所有键的控制(可用于遍历)
@@ -163,6 +166,7 @@ TARGET_PLIST_DIR = "/Library/Preferences"
 subDir = r'SOFTWARE\Native Instruments'
 TARGET_MAC_XML_DIR = "/Library/Application Support/Native Instruments/Service Center"
 TARGET_WIN_XML_DIR = "C:\\Program Files\\Common Files\\Native Instruments\\Service Center"
+TARGET_PLIST_PATH = "/Library/Preferences/com.native-instruments."
 # TARGET_PLIST_DIR = "/Volumes/misc/test/Preferences"
 # TARGET_XML_DIR = "/Volumes/misc/test/Service Center"
 
@@ -199,8 +203,54 @@ def list_all_files(rootdir):
               _files.append(path)
     return _files
 
+def parse_ncint_mac(path):
+    # f = open(path, "r", encoding='unicode_escape')
+    f = open(path, "r", encoding="ISO-8859-1")
+    baseName=os.path.basename(path)
+    libName=baseName.replace(".nicnt", ".")
 
-def parse_ncint(path):
+    lines = f.readlines()  # 读取全部内容 ，并以列表方式返回
+    newXML='<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n'
+
+    for line in lines[1:] : #循环读取每一行，1：是从第二行开始
+        if "</ProductHints>" in line:
+            newXML+=line
+            # print("find:==============="+line)
+            f.close()
+            break
+        else:
+            newXML += line
+
+    f = libName + "xml"
+    full_new_xml = os.path.join(TARGET_XML_DIR, f)
+    # 以只写模式打开我们的文本文件以写入替换的内容
+    with open(full_new_xml, 'w', encoding='UTF-8') as file:
+        # 在我们的文本文件中写入替换的数据
+        file.write(newXML)
+    chmod(full_new_xml, "755")
+    # print("xml:"+newXML)
+    d = xmltodict.parse(newXML)
+    spath = path.replace(baseName,"").replace("/Volumes/","").replace("/",":")
+    # # spath=
+    if('HU'in d["ProductHints"]["Product"]["ProductSpecific"]):
+        hu=d["ProductHints"]["Product"]["ProductSpecific"]['HU']
+    else:
+        hu=''
+    if('JDX'in d["ProductHints"]["Product"]["ProductSpecific"]):
+        jdx=d["ProductHints"]["Product"]["ProductSpecific"]['JDX']
+    else:
+        jdx=''
+
+    if('UPID'in d["ProductHints"]["Product"]):
+        upid=d["ProductHints"]["Product"]['UPID']
+    else:
+        upid=''
+
+    pls = create_plist(d["ProductHints"]["Product"]['Name'], d["ProductHints"]["Product"]['RegKey'], hu, upid, spath,jdx, d["ProductHints"]["Product"]['SNPID'])
+
+    return full_new_xml,pls
+	
+def parse_ncint_win(path):
     # f = open(path, "r", encoding='unicode_escape')
     f = open(path, "r", encoding="ISO-8859-1")
     baseName=os.path.basename(path)
@@ -244,10 +294,7 @@ def parse_ncint(path):
     else:
         upid=''
 
-    if isWindows:
-        create_reg(rName, hu, upid, spath,jdx)
-    else:
-        create_plist(libName, libName, hu, upid, spath,jdx, d["ProductHints"]["Product"]['SNPID'])
+    create_reg(rName, hu, upid, spath,jdx)
     return full_new_xml
 
 
@@ -342,6 +389,7 @@ def create_plist(libName, RegKey, HU,UPID,path,JDX, snpid):
     writePlist(plist, full_new_plist)
     chmod(full_new_plist, "755")
     # print("===dst plist:" + full_new_plist)
+    return full_new_plist
 
 def judge_ktxml(apath):
     if not os.path.isfile(apath):
@@ -366,20 +414,25 @@ def judge_ktxml(apath):
         else:
             return baseName.replace(".xml" , "")
     else:
-        d = bs4.BeautifulSoup(adata, 'xml')
+	    d = bs4.BeautifulSoup(adata , 'xml')
+	    # print(d.Type)
 
-        if "Content" in str(d.Type):
-            return baseName.replace(".xml", "")
-        else:
-            return ""
+	    if "Content" in str(d.Type):
+	        return baseName.replace(".xml" , "")
+	    elif "3rdparty" in str(d.Type):
+	        return baseName.replace(".xml" , "")
+	    else:
+	        return ""
+
 
 
 class Widget(QWidget):
     def __init__(self):
         QWidget.__init__(self)
-        self.setWindowTitle("康泰克助手Kontakt Tool by OwenZhang张礼乐    {}".format(cpuType))
+        self.setWindowTitle("康泰克助手Kontakt Tool by OwenZhang张礼乐  {} - {}".format(osType,cpuType))
         self.dialog = QFileDialog()
         self.list=[]
+        self.plistVector=[]
         self.setupUi()
 
         # dpi = screen.logicalDotsPerInch() * screen.devicePixelRatio()
@@ -412,27 +465,51 @@ class Widget(QWidget):
 
     def doDeleteItem(self, item):
         # 根据item得到它对应的行数
-        row = self.listWidget.indexFromItem(item).row()
-        # 删除item
+        if isWindows:
+            row = self.listWidget.indexFromItem(item).row()
+            # 删除item
 
-        name=self.list[row]
-        item = self.listWidget.takeItem(row)
+            name=self.list[row]
+            item = self.listWidget.takeItem(row)
 
-        realname = item.text()
-        if (realname in name):
-            print("del WENJIAN:" + name)
-            os.remove(name)
+            realname = item.text()
+            if (realname in name):
+                print("del WENJIAN:" + name)
+                os.remove(name)
 
-        if len(realname)<1:
-            baseName=os.path.basename(name)
-            realname=baseName.replace(".xml","")
+            if len(realname)<1:
+                baseName=os.path.basename(name)
+                realname=baseName.replace(".xml","")
 
-        print("del ReG:" + realname)
-        delete_reg(realname)
-        del self.list[row]
-        # 删除widget
-        self.listWidget.removeItemWidget(item)
-        del item
+            print("del ReG:" + realname)
+            delete_reg(realname)
+            del self.list[row]
+            # 删除widget
+            self.listWidget.removeItemWidget(item)
+            del item
+        else:
+            row = self.listWidget.indexFromItem(item).row()
+            # 删除item
+
+            name=self.list[row]
+            if os.path.exists(name):
+                os.remove(name)
+                baseName = os.path.basename(name).split(".")[0]
+                print("base"+baseName)
+                for x in self.plistVector:
+                    if baseName in x:
+                        self.plistVector.remove(x)
+                        if os.path.exists(x):
+                            os.remove(x)
+                            print("del:"+x)
+
+            del self.list[row]
+            item = self.listWidget.takeItem(row)
+
+            # 删除widget
+            self.listWidget.removeItemWidget(item)
+            del item
+
 
     def doClearItem(self):
         if(self.listWidget.count()<1):
@@ -449,34 +526,39 @@ class Widget(QWidget):
 
     def realClear(self):
         # 清空所有Item
-        for _ in range(self.listWidget.count()):
-            # 删除item
-            # 一直是0的原因是一直从第一行删,删掉第一行后第二行变成了第一行
-            # 这个和删除list [] 里的数据是一个道理
+        if isWindows:
+            for _ in range(self.listWidget.count()):
+                # 删除item
+                # 一直是0的原因是一直从第一行删,删掉第一行后第二行变成了第一行
+                # 这个和删除list [] 里的数据是一个道理
 
-            item = self.listWidget.takeItem(0)
-            name = self.list[0]
-            realname = item.text()
+                item = self.listWidget.takeItem(0)
+                name = self.list[0]
+                realname = item.text()
 
 
-            if(realname in name):
-                print("del WENJIAN:" + name)
-                os.remove(name)
+                if(realname in name):
+                    print("del WENJIAN:" + name)
+                    os.remove(name)
 
-            if len(realname) < 1:
-                baseName = os.path.basename(name)
-                realname = baseName.replace(".xml", "")
-            print("del ReG:" + realname)
-            delete_reg(realname)
+                if len(realname) < 1:
+                    baseName = os.path.basename(name)
+                    realname = baseName.replace(".xml", "")
+                print("del ReG:" + realname)
+                delete_reg(realname)
 
-            # 删除widget
-            self.listWidget.removeItemWidget(item)
-            del item
-            del self.list[0]
+                # 删除widget
+                self.listWidget.removeItemWidget(item)
+                del item
+                del self.list[0]
+        else:
+            while self.listWidget.count() > 0:
+                item = self.listWidget.item(0)
+                self.doDeleteItem(item)
+            self.plistVector.clear()
 
         self.listWidget.clear()
         self.list.clear()
-
     def doEmail(self):
         QDesktopServices.openUrl(QUrl("mailto:yuenar2@gmail.com"))
 
@@ -579,7 +661,10 @@ class Widget(QWidget):
                 if ".xml" in fullname:
                     self.add2listView(fullname)
 
-
+            plist=list_all_files(TARGET_PLIST_DIR)
+            for pullname in plist:  # 循环读取每一行，1：是从第二行开始
+                if "com.native-instruments." in pullname:
+                    self.plistVector.append(pullname)
 
         # print(self.list)
     def add2listView(self,fullname):
@@ -613,35 +698,79 @@ class Widget(QWidget):
             return
 
         list = list_all_files(lib_dir)
-        for fullname in list:  # 循环读取每一行，1：是从第二行开始
-            if ".nicnt" in fullname:
-                # print(line)
-                xml = parse_ncint(fullname)
-                # print("parse:" + fullname+"==to=="+xml)
-                self.add2listView(xml)
+        if isWindows :
+            for fullname in list:  # 循环读取每一行，1：是从第二行开始
+                if ".nicnt" in fullname:
+                    # print(line)
+                    xml = parse_ncint_win(fullname)
+                    # print("parse:" + fullname+"==to=="+xml)
+                    self.add2listView(xml)
+        else:
+            for fullname in list:  # mac
+                if ".nicnt" in fullname:
+                    # print(line)
+                    xml, pls = parse_ncint_mac(fullname)
+                    # print("parse:" + fullname+"==to=="+xml)
+                    self.add2listView(xml)
+                    self.plistVector.append(pls)
 
     def import3rdLib(self,path):
-        xml =parse_ncint(path)
-        self.add2listView(xml)
+        if isWindows:
+            xml =parse_ncint_win(path)
+            self.add2listView(xml)
+        else:
+            xml, pls = parse_ncint_mac(path)
+            # print("parse:" + fullname+"==to=="+xml)
+            self.add2listView(xml)
+            self.plistVector.append(pls)
 
 if __name__ == "__main__":
-
     #   获取操作系统可执行程序的结构，，(’32bit’, ‘WindowsPE’)
     if "Windows" in str(platform.architecture()):
         isWindows = True
-        print(platform.architecture())
         TARGET_XML_DIR=TARGET_WIN_XML_DIR
     else:
         isWindows = False
-        print(platform.architecture())
-        TARGET_XML_DIR=TARGET_MAC_XML_DIR
+        TARGET_XML_DIR = TARGET_MAC_XML_DIR
+
+    if isWindows:
+        # print(platform.architecture())
+
+        elevate(show_console=False)
+        akeyHandle = CreateKey(HKEY_LOCAL_MACHINE, subDir)
+        akey1Handle = CreateKey(HKEY_CURRENT_USER, subDir)
+        CloseKey(akeyHandle)
+        CloseKey(akey1Handle)
+    else:
+	    elevate()
+    	# elevate(graphical=False)
+        # if os.geteuid() != 0:
+        #     # print(platform.architecture())
+        #
+        #     # elevate(show_console=False)
+        # # elevate(graphical=True)
+        #     # applescript.AppleScript('display dialog "程序需要完整磁盘权限，App need full disk access." giving up after 2').run()
+        #     # webbrowser.open('x-apple.systempreferences:com.apple.preference.security?Privacy')
+        #     # print("This program must be run as root.Or aborting.")
+        #     # cmd = os.fspath(Path(__file__).resolve().parent / "src/run.sh")
+        #     # os.system(cmd)
+        #     # os.system("open -a Terminal .")
+        #     applescript.AppleScript('display dialog "程序需要输入用户密码，App need input user password." giving up after 2').run()
+        #     applescript.AppleScript('''tell application "Terminal"
+        #                                     activate
+        #                                     set newTab to do script "sudo /Applications/kontakt-tool.app/Contents/MacOS/kontakt-tool"
+        #                                  end tell
+        #                             '''
+        #                             ).run()
+        #     sys.exit(-1)
+
 
     # #   计算机的网络名称，’acer-PC’
     # print(platform.node())
     #
     # # 获取操作系统名称及版本号，’Windows-7-6.1.7601-SP1′
     # print(platform.platform())
-
+    osType=platform.platform().split("-")[0]
     # 计算机处理器信息，’Intel64 Family 6 Model 42 Stepping 7, GenuineIntel’
     cpuType=platform.processor().split(" ")[0]
 
@@ -650,58 +779,6 @@ if __name__ == "__main__":
     #
     # #  获取系统中python解释器的信息
     # print(platform.python_compiler())
-
-
-    elevate(show_console=False)
-    # elevate()
-
-
-    # if isWindows:
-    #     if sys.argv[-1] != ASADMIN:
-    #         script = os.path.abspath(sys.argv[0])
-    #         params = ' '.join([script] + sys.argv[1:] + [ASADMIN])
-    #         shell.ShellExecuteEx(lpVerb='runas', lpFile=sys.executable, lpParameters=params)
-    #         sys.exit(0)
-    #
-    #     else:
-    #         app = QApplication([])
-    #         window = QWidget()
-    #         screen = QApplication.primaryScreen()
-    #
-    #         app.setStyleSheet(StyleSheet)
-    #         window = Widget()
-    #         # window.setScale(density)
-    #         # print(judge_ktxml("/Library/Application Support/Native Instruments/Service Center/ANALOG BRASS AND WINDS.xml"))
-    #
-    #         window.show()
-    #
-    #         # window.test()
-    #         # window.getFullLibs()
-    #         # window.open_ni_dir()
-    #         sys.exit(app.exec())
-    #     # else:
-    #     #     # Re-run the program with admin rights
-    #     #     ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, __file__, None, 1)
-    # else:
-    #     if os.geteuid() != 0:
-    #         # print("This program must be run as root.Or aborting.")
-    #         # cmd = os.fspath(Path(__file__).resolve().parent / "src/run.sh")
-    #         # os.system(cmd)
-    #         # os.system("open -a Terminal .")
-    #         applescript.AppleScript('display dialog "程序需要输入用户密码，App need input user password." giving up after 2').run()
-    #         applescript.AppleScript('''tell application "Terminal"
-    #                                         activate
-    #                                         set newTab to do script "sudo /Applications/kontakt-tool.app/Contents/MacOS/kontakt-tool"
-    #                                      end tell
-    #                                 '''
-    #                                 ).run()
-    #         sys.exit(-1)
-    #     else:
-
-    akeyHandle = CreateKey(HKEY_LOCAL_MACHINE, subDir)
-    akey1Handle = CreateKey(HKEY_CURRENT_USER, subDir)
-    CloseKey(akeyHandle)
-    CloseKey(akey1Handle)
 
     app = QApplication([])
     window = QWidget()
