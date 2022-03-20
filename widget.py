@@ -15,7 +15,7 @@ from PySide6.QtCore import QUrl
 from PySide6.QtGui import QDesktopServices, QPixmap
 from PySide6.QtWidgets import QMessageBox, QFileDialog
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QPushButton, \
-    QListWidgetItem, QVBoxLayout, QListWidget, QApplication
+    QListWidgetItem, QVBoxLayout, QListWidget, QApplication,QPlainTextEdit,QLabel
 from biplist import *
 import webbrowser
 from elevate import elevate
@@ -25,11 +25,12 @@ import applescript
 isWindows= False
 cpuType="Intel"
 osType="Mac"
+bankCounts=0
 
-# from winreg import *
-# # 1.连接注册表根键，以HKEY_LOCAL_MACHINE为例
-# regRoot = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
-# regUser = ConnectRegistry(None, HKEY_CURRENT_USER)
+from winreg import *
+# 1.连接注册表根键，以HKEY_LOCAL_MACHINE为例
+regRoot = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
+regUser = ConnectRegistry(None, HKEY_CURRENT_USER)
 
 
 # 2.获取指定目录下所有键的控制(可用于遍历)
@@ -49,7 +50,7 @@ class ItemWidget(QWidget):
         line.setFixedSize(QSize(340, 40))
         line.setReadOnly(True)
         layout.addWidget(line)
-        btn=QPushButton('X ', self, clicked=self.doDeleteItem)
+        btn=QPushButton('x ', self, clicked=self.doDeleteItem)
         btn.setFixedSize(QSize(40, 40))
         layout.addWidget(btn)
 
@@ -64,12 +65,13 @@ StyleSheet = """
 /*这里是通用设置，所有按钮都有效，不过后面的可以覆盖这个*/
 QLineEdit {
     border: transparent;
-    color: #030303;
+    color: #5B6164;
     background-color: #CBD1D5;
 }
 QLabel{
     outline: none;
-    color:#292421;
+    color:#5B6164;
+    font: bold italic
 }
 
 QListView {
@@ -95,6 +97,7 @@ QPushButton {
     border: none; /*去掉边框*/
     background-color: #CBD1D5;
     color:#FFFAFA;
+    font: bold 
 }
 /*
 QPushButton#xxx
@@ -510,6 +513,8 @@ class Widget(QWidget):
             self.listWidget.removeItemWidget(item)
             del item
 
+    def updateTile(self):
+        self.titleLine.setText('已加载 {} 套音色'.format(self.listWidget.count()))
 
     def doClearItem(self):
         if(self.listWidget.count()<1):
@@ -586,16 +591,27 @@ class Widget(QWidget):
     def setupUi(self):
         mainLay= QVBoxLayout(self)
         layout = QHBoxLayout(self)
-
+        vLay = QVBoxLayout(self)
         # 列表
         self.listWidget = QListWidget(self)
-        self.listWidget.setFixedWidth(400)
+        self.titleLine = QLabel(self)
+        self.titleLine.setEnabled(False)
+        self.titleLine.resize(378,20)
+        self.titleLine.move(13,0)
+
+        # self.titleLine.setText('已加载 {} 套音色'.format(self.listWidget.count()))
+
+        self.listWidget.setFixedWidth(384)
+        self.listWidget.currentItemChanged.connect(self.updateTile)
+        # vLay.addWidget(self.titleLine)
         layout.addWidget(self.listWidget)
 
         # //https://y.qq.com/n/ryqq/singer/0044yxPF1Zultc
         firstPageWidget = PWidget()
         firstPageWidget.importPath.connect(self.import3rdLib)
         layout.addWidget(firstPageWidget)
+
+        mainLay.addLayout(vLay)
         mainLay.addLayout(layout)
 
         hVl = QHBoxLayout(self)
@@ -666,6 +682,7 @@ class Widget(QWidget):
                 if "com.native-instruments." in pullname:
                     self.plistVector.append(pullname)
 
+        bankCounts=self.listWidget.count()
         # print(self.list)
     def add2listView(self,fullname):
         n = judge_ktxml(fullname)
@@ -736,7 +753,7 @@ if __name__ == "__main__":
     if isWindows:
         # print(platform.architecture())
 
-        elevate(show_console=False)
+        # elevate(show_console=False)
         akeyHandle = CreateKey(HKEY_LOCAL_MACHINE, subDir)
         akey1Handle = CreateKey(HKEY_CURRENT_USER, subDir)
         CloseKey(akeyHandle)
