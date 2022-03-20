@@ -65,7 +65,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>音色目录Output folder：</string>
+    <string>音色目录Bank folder：</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_5">
@@ -73,12 +73,12 @@
     <rect>
      <x>60</x>
      <y>0</y>
-     <width>191</width>
+     <width>251</width>
      <height>21</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">font: bold</string>
+    <string notr="true">font: bold 16px</string>
    </property>
    <property name="text">
     <string>非标准入库 NICNT Generator</string>
@@ -89,7 +89,7 @@
     <rect>
      <x>20</x>
      <y>370</y>
-     <width>151</width>
+     <width>251</width>
      <height>31</height>
     </rect>
    </property>

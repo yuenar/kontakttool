@@ -68,10 +68,13 @@ QLineEdit {
     color: #5B6164;
     background-color: #CBD1D5;
 }
+QWidget{
+    font-family: "STFangsong";
+}
 QLabel{
     outline: none;
     color:#5B6164;
-    font: bold italic
+    font: bold italic 14px
 }
 
 QListView {
@@ -753,7 +756,7 @@ if __name__ == "__main__":
     if isWindows:
         # print(platform.architecture())
 
-        # elevate(show_console=False)
+        elevate(show_console=False)
         akeyHandle = CreateKey(HKEY_LOCAL_MACHINE, subDir)
         akey1Handle = CreateKey(HKEY_CURRENT_USER, subDir)
         CloseKey(akeyHandle)
