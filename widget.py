@@ -515,6 +515,7 @@ class Widget(QWidget):
             # 删除widget
             self.listWidget.removeItemWidget(item)
             del item
+        self.updateTile()
 
     def updateTile(self):
         self.titleLine.setText('已加载 {} 套音色'.format(self.listWidget.count()))
@@ -567,6 +568,7 @@ class Widget(QWidget):
 
         self.listWidget.clear()
         self.list.clear()
+        self.updateTile()
     def doEmail(self):
         QDesktopServices.openUrl(QUrl("mailto:yuenar2@gmail.com"))
 
@@ -605,7 +607,8 @@ class Widget(QWidget):
         # self.titleLine.setText('已加载 {} 套音色'.format(self.listWidget.count()))
 
         self.listWidget.setFixedWidth(384)
-        self.listWidget.currentItemChanged.connect(self.updateTile)
+        # self.listWidget.itemSelectionChanged.connect(self.updateTile)
+        # self.listWidget.currentItemChanged.connect(self.updateTile)
         # vLay.addWidget(self.titleLine)
         layout.addWidget(self.listWidget)
 
@@ -704,6 +707,7 @@ class Widget(QWidget):
         widget.itemDeleted.connect(self.doDeleteItem)
         self.listWidget.setItemWidget(item, widget)
         self.list.append(fullname)
+        self.updateTile()
 
     def open_ni_dir(self):
         if not os.path.exists(TARGET_PLIST_DIR):
@@ -725,6 +729,8 @@ class Widget(QWidget):
                     xml = parse_ncint_win(fullname)
                     # print("parse:" + fullname+"==to=="+xml)
                     self.add2listView(xml)
+                    continue
+                    # break
         else:
             for fullname in list:  # mac
                 if ".nicnt" in fullname:
@@ -733,6 +739,7 @@ class Widget(QWidget):
                     # print("parse:" + fullname+"==to=="+xml)
                     self.add2listView(xml)
                     self.plistVector.append(pls)
+                    continue
 
     def import3rdLib(self,path):
         if isWindows:
