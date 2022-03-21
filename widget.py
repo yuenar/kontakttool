@@ -358,12 +358,11 @@ if __name__ == "__main__":
     else:
 	    elevate()
 
-    	# elevate(graphical=False)
         # if os.geteuid() != 0:
-        #     # print(platform.architecture())
-        #
-        #     # elevate(show_console=False)
-        # # elevate(graphical=True)
+        # #     # print(platform.architecture())
+        # #
+        # #     # elevate(show_console=False)
+        # # # elevate(graphical=True)
         #     # applescript.AppleScript('display dialog "程序需要完整磁盘权限，App need full disk access." giving up after 2').run()
         #     # webbrowser.open('x-apple.systempreferences:com.apple.preference.security?Privacy')
         #     # print("This program must be run as root.Or aborting.")

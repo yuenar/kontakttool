@@ -3,6 +3,7 @@
 
 import stat
 import re
+import os,sys
 from pathlib import Path
 
 isWindows= False

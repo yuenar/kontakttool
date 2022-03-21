@@ -3,7 +3,7 @@
 
 import bs4
 import xmltodict
-import os
+import os,sys
 
 from config import *
 from biplist import *
@@ -96,13 +96,13 @@ def parse_ncint_mac(path):
             newXML += line
 
     f = libName + "xml"
-    full_new_xml = os.path.join(TARGET_XML_DIR, f)
+    full_new_xml = os.path.join(TARGET_MAC_XML_DIR, f)
     # 以只写模式打开我们的文本文件以写入替换的内容
     with open(full_new_xml, 'w', encoding='UTF-8') as file:
         # 在我们的文本文件中写入替换的数据
         file.write(newXML)
     chmod(full_new_xml, "755")
-    # print("xml:"+newXML)
+    # print("create xml:"+newXML)
     d = xmltodict.parse(newXML)
     spath = path.replace(baseName, "").replace("/Volumes/", "").replace("/", ":")
     # # spath=
@@ -146,13 +146,13 @@ def parse_ncint_win(path):
             newXML += line
 
     f = libName + "xml"
-    full_new_xml = os.path.join(TARGET_XML_DIR, f)
+    full_new_xml = os.path.join(TARGET_WIN_XML_DIR, f)
     # 以只写模式打开我们的文本文件以写入替换的内容
     with open(full_new_xml, 'w', encoding='UTF-8') as file:
         # 在我们的文本文件中写入替换的数据
         file.write(newXML)
     chmod(full_new_xml, "755")
-    # print("xml:"+newXML)
+    print("new xml:"+newXML)
     d = xmltodict.parse(newXML)
     spath = path.replace(baseName, "").replace("/Volumes/", "").replace("/", ":")
     # # spath=
