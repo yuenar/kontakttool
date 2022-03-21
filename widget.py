@@ -7,12 +7,11 @@ import platform
 import sys
 from pathlib import Path
 
-import bs4
 from PySide6.QtCore import QUrl
 from PySide6.QtGui import QDesktopServices, QPixmap
 from PySide6.QtWidgets import QMessageBox, QFileDialog
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QPushButton, \
-    QListWidgetItem, QVBoxLayout, QListWidget, QApplication,QPlainTextEdit,QLabel
+     QVBoxLayout, QListWidget, QApplication,QLabel
 
 from config import *
 from elevate import elevate
@@ -21,11 +20,10 @@ from listwidget import *
 from utiltool import *
 import applescript
 
-
 class Widget(QWidget):
     def __init__(self):
         QWidget.__init__(self)
-        self.setWindowTitle("康泰克助手Kontakt Tool by OwenZhang张礼乐  {} - {}".format(osType,cpuType))
+        self.setWindowTitle("音色库管理工具Kontakt Tool by OwenZhang张礼乐  {} - {}".format(osType,cpuType))
         self.dialog = QFileDialog()
         self.list=[]
         self.plistVector=[]
@@ -159,11 +157,12 @@ class Widget(QWidget):
         self.listWidget.clear()
         self.list.clear()
         self.updateTile()
-    def doEmail(self):
-        QDesktopServices.openUrl(QUrl("mailto:yuenar2@gmail.com"))
+    def doVisit(self):
+        # QDesktopServices.openUrl(QUrl("mailto:yuenar2@gmail.com"))
+        QDesktopServices.openUrl(QUrl("https://tools.pro-music.cn/"))
 
-    # def doHelper(self):
-    #     self.sw.setCurrentIndex(2)
+    def doHelper(self):
+        self.sw.setCurrentIndex(2)
 
     def doDonate(self):
         msgBox = QMessageBox(self)
@@ -190,6 +189,7 @@ class Widget(QWidget):
         mainLay= QVBoxLayout(self)
         layout = QHBoxLayout(self)
         vLay = QVBoxLayout(self)
+
         # 列表
         self.listWidget = QListWidget(self)
         self.titleLine = QLabel(self)
@@ -227,8 +227,8 @@ class Widget(QWidget):
         oBtn=QPushButton("关注作者Follow", self,
                                      objectName="OrangeButton", minimumHeight=48 ,clicked=self.doFollow)
 
-        eBtn=QPushButton("写邮件Email", self,
-                                     objectName="OrangeButton", minimumHeight=48 ,clicked=self.doEmail)
+        eBtn=QPushButton("访问官网HomePage", self,
+                                     objectName="OrangeButton", minimumHeight=48 ,clicked=self.doVisit)
 
         hVl.addWidget(fBtn)
         hVl.addWidget(tBtn)
@@ -238,7 +238,6 @@ class Widget(QWidget):
         self.setLayout(mainLay)
 
     def getFullLibs(self):
-
         if isWindows:
 
             keyHandle = OpenKey(HKEY_LOCAL_MACHINE, subDir)
@@ -260,7 +259,7 @@ class Widget(QWidget):
                     aname=TARGET_WIN_XML_DIR+"\\"+subKeyName+".xml"
                     fullname=aname.replace("\\","/")
                     self.add2listView(fullname)
-                    print(fullname)
+
                     CloseKey(keyHandle_2)  # 读写操作结束后关闭键
             CloseKey(keyHandle)
 
@@ -281,8 +280,6 @@ class Widget(QWidget):
                 if "com.native-instruments." in pullname:
                     self.plistVector.append(pullname)
 
-        bankCounts=self.listWidget.count()
-        # print(self.list)
     def add2listView(self,fullname):
         n = judge_ktxml(fullname)
         if (len(str(n)) < 1):
@@ -356,7 +353,7 @@ if __name__ == "__main__":
     if isWindows:
         # print(platform.architecture())
 
-        # elevate(show_console=False)
+        elevate(show_console=False)
         akeyHandle = CreateKey(HKEY_LOCAL_MACHINE, subDir)
         akey1Handle = CreateKey(HKEY_CURRENT_USER, subDir)
         CloseKey(akeyHandle)
@@ -383,7 +380,6 @@ if __name__ == "__main__":
         #                             '''
         #                             ).run()
         #     sys.exit(-1)
-
 
     # #   计算机的网络名称，’acer-PC’
     # print(platform.node())
