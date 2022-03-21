@@ -106,7 +106,7 @@ class Widget(QWidget):
         self.updateTile()
 
     def updateTile(self):
-        self.titleLine.setText('已加载 {} 套音色'.format(self.listWidget.count()))
+        self.titleLine.setText('  Loaded banks已加载:  {}  套音色'.format(self.listWidget.count()))
 
     def doClearItem(self):
         if(self.listWidget.count()<1):
@@ -116,8 +116,8 @@ class Widget(QWidget):
         msgBox.resize(360,240)
         msgBox.setWindowTitle('警告Warning')
         msgBox.setIcon(QMessageBox.Warning)
-        msgBox.setText("是否清空所有入库音色？操作不可还原！Clear all banked tones? The operation is irreversible!")
-        okButton = msgBox.addButton(self.tr("确定Go on"), QMessageBox.ActionRole)
+        msgBox.setText("是否清空所有入库音色？操作不可还原！\n Clear all banked tones? The operation is irreversible!")
+        okButton = msgBox.addButton(self.tr("确定\nGo on"), QMessageBox.ActionRole)
         okButton.clicked.connect(self.realClear)
         msgBox.exec()
 
@@ -168,11 +168,11 @@ class Widget(QWidget):
         msgBox = QMessageBox(self)
         msgBox.resize(360,240)
         # msgBox.setText("Alipay支付宝")
-        msgBox.setInformativeText("支付宝向我捐赠？Donate by alipay?")
+        msgBox.setInformativeText("支付宝向我捐赠？\n Donate by alipay?")
         src = os.fspath(Path(__file__).resolve().parent /"src/alipay.png")
         p = QPixmap(src)
         msgBox.setIconPixmap(p.scaled(256, 256))
-        palButton = msgBox.addButton(self.tr("Or Paypal或贝宝？"), QMessageBox.ActionRole)
+        palButton = msgBox.addButton(self.tr("Or Paypal\n或贝宝？"), QMessageBox.ActionRole)
         palButton.clicked.connect(self.paypal)
         msgBox.exec()
 
@@ -181,9 +181,6 @@ class Widget(QWidget):
 
     def doFollow(self):
         QDesktopServices.openUrl(QUrl("https://y.qq.com/n/ryqq/singer/0044yxPF1Zultc"))
-
-    def randomData(self):
-        self.la
 
     def setupUi(self):
         mainLay= QVBoxLayout(self)
@@ -215,16 +212,16 @@ class Widget(QWidget):
 
         hVl = QHBoxLayout(self)
         # 清空按钮
-        self.clearBtn = QPushButton('清空音色Clear libs', self, objectName="OrangeButton", minimumHeight=48 ,clicked=self.doClearItem)
+        self.clearBtn = QPushButton('清空音色 Clear banks', self, objectName="OrangeButton", minimumHeight=48 ,clicked=self.doClearItem)
         hVl.addWidget(self.clearBtn)
 
-        fBtn=QPushButton("批量导入Import libs", self,
+        fBtn=QPushButton("导入音色Load banks", self,
                                      objectName="OrangeButton", minimumHeight=48 ,clicked=self.open_ni_dir)
 
         tBtn=QPushButton("捐赠Donate", self,
                                      objectName="OrangeButton", minimumHeight=48 ,clicked=self.doDonate)
 
-        oBtn=QPushButton("关注作者Follow", self,
+        oBtn=QPushButton("关注作者Follow me", self,
                                      objectName="OrangeButton", minimumHeight=48 ,clicked=self.doFollow)
 
         eBtn=QPushButton("访问官网HomePage", self,
@@ -360,6 +357,7 @@ if __name__ == "__main__":
         CloseKey(akey1Handle)
     else:
 	    elevate()
+
     	# elevate(graphical=False)
         # if os.geteuid() != 0:
         #     # print(platform.architecture())
@@ -386,7 +384,7 @@ if __name__ == "__main__":
     #
     # # 获取操作系统名称及版本号，’Windows-7-6.1.7601-SP1′
     # print(platform.platform())
-    osType=platform.platform().split("-")[0]
+    osType = str(platform.platform().split("-")[0])
     # 计算机处理器信息，’Intel64 Family 6 Model 42 Stepping 7, GenuineIntel’
     cpuType=platform.processor().split(" ")[0]
 

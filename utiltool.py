@@ -8,10 +8,10 @@ import os
 from config import *
 from biplist import *
 
-from winreg import *
-# 1.连接注册表根键，以HKEY_LOCAL_MACHINE为例
-regRoot = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
-regUser = ConnectRegistry(None, HKEY_CURRENT_USER)
+# from winreg import *
+# # 1.连接注册表根键，以HKEY_LOCAL_MACHINE为例
+# regRoot = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
+# regUser = ConnectRegistry(None, HKEY_CURRENT_USER)
 
 
 def judge_ktxml(apath):

@@ -6,8 +6,8 @@ import re
 from pathlib import Path
 
 isWindows= False
-cpuType="Intel"
-osType="Mac"
+cpuType = "Intel"
+osType = "Mac"
 bankCounts=0
 
 StyleSheet = """
@@ -82,13 +82,13 @@ QPushButton:pressed {
     background-color: #CAD1D5;
 }
 #BlueButton {
-    background-color: #2196f3;
+    background-color: #5B6164;
     /*限制最小最大尺寸*/
-    min-width: 96px;
-    max-width: 96px;
-    min-height: 96px;
-    max-height: 96px;
-    border-radius: 48px; /*圆形*/
+    min-width: 36px;
+    max-width: 36px;
+    min-height: 36px;
+    max-height: 36px;
+    border-radius: 18px; /*圆形*/
 }
 #BlueButton:hover {
     background-color: #64b5f6;

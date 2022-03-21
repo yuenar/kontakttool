@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-
+import random
 from pathlib import Path
 from utiltool import create_nicnt
 from PySide6.QtWidgets import QPushButton, QWidget,QFileDialog,QLineEdit, QTextBrowser,QMessageBox
@@ -21,16 +21,25 @@ class PWidget(QWidget):
         wpBtn.move(250,280)
         wpBtn.resize(100,36)
 
-
         opBtn=QPushButton("选图Take Image", self,
                                      objectName="GreenButton", minimumHeight=32 ,clicked=self.openPic)
         opBtn.move(250,360)
         opBtn.resize(100, 36)
 
-        cBtn=QPushButton("生成并导入库Create .nicnt && Export to Library ", self,
+        rBtn=QPushButton("随机填充数据\nGenerate random data ", self,
+                                     objectName="GreenButton", minimumHeight=32 ,clicked=self.doRandom)
+        rBtn.move(20,460)
+        rBtn.resize(160, 32)
+
+        cBtn=QPushButton("标记并导入非标准库\nMark && Load 3rd Bank ", self,
                                      objectName="GreenButton", minimumHeight=32 ,clicked=self.doCreateNcint)
-        cBtn.move(20,460)
-        cBtn.resize(330, 32)
+        cBtn.move(190,460)
+        cBtn.resize(160, 32)
+
+        # hBtn=QPushButton(" ？ ", self,
+        #                               objectName="BlueButton",minimumHeight=32 ,clicked=self.doVisit)
+        # hBtn.move(350,460)
+        # hBtn.resize(330, 32)
 
         vtor=QRegularExpressionValidator()
         vtor.setRegularExpression(QRegularExpression("[^%&',;=?$\x22]+[a-zA-Z0-9]+$"))
@@ -61,7 +70,7 @@ class PWidget(QWidget):
         self.sle.resize(330, 36)
 
         self.ole=QLineEdit(self)
-        self.ole.setPlaceholderText("选择输出路径，choose a floder.")
+        self.ole.setPlaceholderText("选择非标音色目录，choose a 3rd-bank floder.")
         self.ole.move(20, 320)
         self.ole.resize(330, 36)
 
@@ -73,7 +82,7 @@ class PWidget(QWidget):
         self.msgBox = QMessageBox()
         self.msgBox.setWindowTitle('警告Warning')
         self.msgBox.setIcon(QMessageBox.Warning)
-        self.msgBox.setInformativeText("请检查输入Please check your input！")
+        self.msgBox.setInformativeText("请检查输入！\nPlease check your input！")
 
     def load_ui(self):
         loader = QUiLoader()
@@ -92,6 +101,41 @@ class PWidget(QWidget):
 
         self.ole.setText(lib_dir)
 
+    def doRandom(self):
+        if len(self.ole.text()) <1:
+            self.msgBox.setText("选择非标音色目录!\n choose a 3rd-bank floder！")
+            self.msgBox.show()
+            return
+        else:
+            if(os.path.exists(self.ole.text())):
+                baseName=os.path.basename(self.ole.text())
+                print("base"+baseName)
+                if("-" in baseName):
+                    comName=baseName.split("-",1)[0]
+                    bName=baseName.split("-",1)[1]
+                    self.cle.setText(comName)
+                    self.ble.setText(bName)
+                elif(" " in baseName):
+                    comName=baseName.split(" ",1)[0]
+                    bName=baseName.split(" ",1)[1]
+                    self.cle.setText(comName)
+                    self.ble.setText(bName)
+                elif("." in baseName):
+                    comName=baseName.split(".",1)[0]
+                    bName=baseName.split(".",1)[1]
+                    self.cle.setText(comName)
+                    self.ble.setText(bName)
+                else:
+                    self.cle.setText("Kontakt")
+                s=len(baseName)
+                alpha=s%3
+                if(alpha==0):
+                    self.sle.setText("d"+str(s))
+                elif (alpha == 1):
+                    self.sle.setText("e" + str(s))
+                else:
+                    self.sle.setText(str(random.randint(210,9999)))
+
     def openPic(self):
         lib_dir = self.dialog.getOpenFileName(self,"please choose an image file",os.getcwd(),"Image Files(*.jpg *.png )")
         if len(lib_dir) < 1:
@@ -101,19 +145,19 @@ class PWidget(QWidget):
 
     def doCreateNcint(self):
         if(len(self.cle.text())<1):
-            self.msgBox.setText("公司名不得为空Cannot input null！")
+            self.msgBox.setText("公司名不得为空！\nCannot input null！")
             self.msgBox.show()
         elif (len(self.ble.text())<1):
-            self.msgBox.setText("音色名不得为空Cannot input null！")
+            self.msgBox.setText("音色名不得为空！\nCannot input null！")
             self.msgBox.show()
         elif (len(self.sle.text())<1):
-            self.msgBox.setText("音色id不得为空Cannot input null！")
+            self.msgBox.setText("音色id不得为空！\nCannot input null！")
             self.msgBox.show()
         elif (len(self.ole.text())<1):
-            self.msgBox.setText("路径不得为空Cannot input null！")
+            self.msgBox.setText("路径不得为空！\nCannot input null！")
             self.msgBox.show()
         elif not os.path.exists(self.ole.text()):
-            self.msgBox.setText("路径不存在Is not exist！")
+            self.msgBox.setText("路径不存在！\nIs not exist！")
             self.msgBox.show()
         else:
             # print("creating...")
