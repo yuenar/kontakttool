@@ -340,8 +340,10 @@ class Widget(QWidget):
 
 if __name__ == "__main__":
     #   获取操作系统可执行程序的结构，，(’32bit’, ‘WindowsPE’)
+    global isWindows
     if "Windows" in str(platform.architecture()):
-        isWindows = True
+
+        isWindows= True
         TARGET_XML_DIR=TARGET_WIN_XML_DIR
     else:
         isWindows = False
