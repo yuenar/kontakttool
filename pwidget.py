@@ -1,29 +1,14 @@
 # This Python file uses the following encoding: utf-8
-import os
-from pathlib import Path
-import sys
+# -*- coding: utf-8 -*-
 
+import os
+
+from pathlib import Path
+from utiltool import create_nicnt
 from PySide6.QtWidgets import QPushButton, QWidget,QFileDialog,QLineEdit, QTextBrowser,QMessageBox
 from PySide6.QtGui import QRegularExpressionValidator,QImage
 from PySide6.QtCore import QFile,QRegularExpression, Signal
 from PySide6.QtUiTools import QUiLoader
-
-def create_nicnt(compyName,libName,snpid,path):
-    if os.path.isdir(path):
-        src = os.fspath(Path(__file__).resolve().parent /"src/Source.nicnt")
-        fullname=libName+".nicnt"
-        fullpath=os.path.join(path,fullname)
-
-        fp3 = open(src, "r", encoding="ISO-8859-1")
-        fp4 = open(fullpath, "w")
-
-        for s in fp3.readlines():  # 先读出来
-            fp4.write(s.replace("libName", libName).replace("sid",snpid).replace("compName",compyName))  # 替换 并写入
-
-        fp3.close()
-        fp4.close()
-        # print("done")
-        return fullpath
 
 class PWidget(QWidget):
     importPath = Signal(str)
