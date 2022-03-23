@@ -359,11 +359,11 @@ if __name__ == "__main__":
 
     # print(register.getCombinNumber())
     # print("--------------------------------------------------")
-    # idcode=bytes(register.getCombinNumber(), encoding = "utf8")
-    # print(idcode)
-    # print("===================================================")
-    # regcode=str(register.Encrypted(idcode))
-    # print(regcode)
+    idcode=bytes(register.getCombinNumber(), encoding = "utf8")
+    print(idcode)
+    print("===================================================")
+    regcode=str(register.Encrypted(idcode))
+    print(regcode)
 
 
 

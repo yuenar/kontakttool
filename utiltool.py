@@ -27,7 +27,7 @@ from passlib.hash import sha256_crypt
 
 class RegisterClass:
     def __init__(self):
-        self.key = "DESCRYPT"  # Key
+        self.key = b'owenzhang'  # Key
         self.iv = "\x15\1\x2a\3\1\x23\2\0"  # 自定IV向量
         # self.mode = AES.MODE_CBC
 
@@ -55,7 +55,7 @@ class RegisterClass:
     ############ 2. 注册登录
 
     def Encrypted(self, tr):
-        EncryptStr = sha256_crypt.encrypt(base64.b64encode(tr))
+        EncryptStr = sha256_crypt.encrypt(base64.b64encode(tr+self.key))
         # EncryptStr = binascii.unhexlify(k.encrypt(str))
         ###  print('注册码：',base64.b64encode(EncryptStr))
         return EncryptStr  # 转base64编码返回
