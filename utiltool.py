@@ -118,11 +118,11 @@ class RegisterClass:
         ###  print('注册码：',base64.b64encode(EncryptStr))
         return base64.b64encode(EncryptStr)  # 转base64编码返回
 
-    #des+base64解码
-    def DesDecrypt(self,tr):
-        k = des(self.Des_Key, CBC, self.Des_IV, pad=None, padmode=PAD_PKCS5)
-        DecryptStr = k.decrypt(tr)
-        return base64.b64decode(DecryptStr) #转base64解码返回
+    # #des+base64解码
+    # def DesDecrypt(self,tr):
+    #     k = des(self.Des_Key, CBC, self.Des_IV, pad=None, padmode=PAD_PKCS5)
+    #     DecryptStr = k.decrypt(tr)
+    #     return base64.b64decode(DecryptStr) #转base64解码返回
 
     # 获取注册码，验证成功后生成注册文件
     def regist(self):
