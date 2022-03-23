@@ -10,6 +10,7 @@ isWindows= True
 cpuType = "Intel"
 osType = "Mac"
 bankCounts=0
+idcode="uni"
 
 StyleSheet = """
 /*这里是通用设置，所有按钮都有效，不过后面的可以覆盖这个*/
