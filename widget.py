@@ -18,6 +18,7 @@ from elevate import elevate
 from pwidget import PWidget
 from listwidget import *
 from utiltool import *
+from QtSingleApplication import QtSingleApplication
 import applescript
 
 class Widget(QWidget):
@@ -167,8 +168,8 @@ class Widget(QWidget):
     def doDonate(self):
         msgBox = QMessageBox(self)
         msgBox.resize(360,240)
-        # msgBox.setText("Alipay支付宝")
-        msgBox.setInformativeText("支付宝向我捐赠？\n Donate by alipay?")
+        msgBox.setWindowTitle("支付宝向我捐赠？\n Donate by alipay?")
+        msgBox.setInformativeText(" 开发不易，感谢支持!\n Development is not easy,\n thanks for the support!")
         src = os.fspath(Path(__file__).resolve().parent /"src/alipay.png")
         p = QPixmap(src)
         msgBox.setIconPixmap(p.scaled(256, 256))
@@ -395,15 +396,20 @@ if __name__ == "__main__":
     # #  获取系统中python解释器的信息
     # print(platform.python_compiler())
 
-    app = QApplication([])
+    # app = QApplication([])
+    appGuid = 'F3FF80BA-BA05-4277-8063-82A6DB9245A2'
+    app = QtSingleApplication(appGuid, sys.argv)
+    if app.isRunning(): sys.exit(0)
+
     window = QWidget()
     screen = QApplication.primaryScreen()
 
     app.setStyleSheet(StyleSheet)
     window = Widget()
-
     window.show()
     window.move((1920-1080)*0.5,100)
+    window.doDonate()
+
     # window.test()
     # window.getFullLibs()
     # window.open_ni_dir()
