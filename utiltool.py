@@ -17,8 +17,6 @@ regUser = ConnectRegistry(None, HKEY_CURRENT_USER)
 #  1. 检测到有注册文件时，注册文件中的注册码和DES+base64加密的注册码比较，若一致，则通过认证，进入主程序。
 #  2. 未检测到注册文件或者注册文件中的注册码与DES+base64加密的注册码不一致,则提醒用户输入注册码或重新获取注册码。
 #     重新获取注册码会将程序运行后显示的机器码 161k8Z  发送给指定管理员，管理员经过编码生成注册码给回用户，同时生成注册文件。
-import json
-from PySide6.QtCore import QProcess
 
 import uuid
 import base64

@@ -418,14 +418,15 @@ if __name__ == "__main__":
     # #  获取系统中python解释器的信息
     # print(platform.python_compiler())
 
-    # app = QApplication([])
 
-
-
-
-    appGuid = 'kontakt'
-    app = QtSingleApplication(appGuid, sys.argv)
-    if app.isRunning(): sys.exit(0)
+    if isWindows:
+        app = QApplication([])
+    else:
+        appGuid = 'kontakt'+register.getCombinNumber()
+        app = QtSingleApplication(appGuid, sys.argv)
+        if app.isRunning():
+            # app.activationWindow()
+            sys.exit(0)
 
 
 
