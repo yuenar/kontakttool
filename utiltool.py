@@ -30,21 +30,6 @@ class RegisterClass:
         # self.mode = AES.MODE_CBC
 
     def getCombinNumber(self):
-        if isWindows:
-            return self.getWinCid()
-        else:
-            return self.getMacSid()
-    def getMacSid(self):
-        proc=QProcess()
-        args=""
-        args << "-c" << "ioreg -rd1 -c IOPlatformExpertDevice |  awk '/IOPlatformSerialNumber/ { print $3; }'"
-        proc.start("/bin/bash", args)
-        proc.waitForFinished()
-        ret = str(proc.readAll().mid(1, 12))
-        return ret
-
-
-    def getWinCid(self):
         s_uuid = str(uuid.uuid5(uuid.NAMESPACE_DNS, 'owenzhang'))
         l_uuid = s_uuid.split('-')
         s_uuid = ''.join(l_uuid)
