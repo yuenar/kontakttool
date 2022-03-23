@@ -356,99 +356,100 @@ if __name__ == "__main__":
     # print(register.get_network_info())
     # print(register.get_mainboard_info())
     # print("===================================================")
+
     # print(register.getCombinNumber())
-    idcode=register.getCombinNumber()
-    print("===================================================")
-    regcode=str(register.Encrypted(idcode), encoding = "utf8")
-    print(regcode)
-    code=bytes("3gXd6kgMdaU=", encoding = "utf8")
-    if(code==regcode):
-        print("激活成功！")
+    # print("--------------------------------------------------")
+    # idcode=bytes(register.getCombinNumber(), encoding = "utf8")
+    # print(idcode)
+    # print("===================================================")
+    # regcode=str(register.Encrypted(idcode))
+    # print(regcode)
 
 
 
-    # if isWindows:
-    #     # print(platform.architecture())
-    #     #
-    #     # # #   计算机的网络名称，’acer-PC’
-    #     # print(platform.node())
+
+    if isWindows:
+        # print(platform.architecture())
+        #
+        # # #   计算机的网络名称，’acer-PC’
+        # print(platform.node())
+
+
+        elevate(show_console=False)
+        akeyHandle = CreateKey(HKEY_LOCAL_MACHINE, subDir)
+        akey1Handle = CreateKey(HKEY_CURRENT_USER, subDir)
+        CloseKey(akeyHandle)
+        CloseKey(akey1Handle)
+    else:
+	    elevate()
+
+        # if os.geteuid() != 0:
+        # #     # print(platform.architecture())
+        # #
+        # #     # elevate(show_console=False)
+        # # # elevate(graphical=True)
+        #     # applescript.AppleScript('display dialog "程序需要完整磁盘权限，App need full disk access." giving up after 2').run()
+        #     # webbrowser.open('x-apple.systempreferences:com.apple.preference.security?Privacy')
+        #     # print("This program must be run as root.Or aborting.")
+        #     # cmd = os.fspath(Path(__file__).resolve().parent / "src/run.sh")
+        #     # os.system(cmd)
+        #     # os.system("open -a Terminal .")
+        #     applescript.AppleScript('display dialog "程序需要输入用户密码，App need input user password." giving up after 2').run()
+        #     applescript.AppleScript('''tell application "Terminal"
+        #                                     activate
+        #                                     set newTab to do script "sudo /Applications/kontakt-tool.app/Contents/MacOS/kontakt-tool"
+        #                                  end tell
+        #                             '''
+        #                             ).run()
+        #     sys.exit(-1)
+
+    # #   计算机的网络名称，’acer-PC’
+    # print(platform.node())
     #
+    # # 获取操作系统名称及版本号，’Windows-7-6.1.7601-SP1′
+    # print(platform.platform())
+    osType = str(platform.platform().split("-")[0])
+    # 计算机处理器信息，’Intel64 Family 6 Model 42 Stepping 7, GenuineIntel’
+    cpuType=platform.processor().split(" ")[0]
+
+    # # 获取操作系统中Python的构建日期
+    # print(platform.python_build())
     #
-    #     elevate(show_console=False)
-    #     akeyHandle = CreateKey(HKEY_LOCAL_MACHINE, subDir)
-    #     akey1Handle = CreateKey(HKEY_CURRENT_USER, subDir)
-    #     CloseKey(akeyHandle)
-    #     CloseKey(akey1Handle)
-    # else:
-	#     elevate()
-    #
-    #     # if os.geteuid() != 0:
-    #     # #     # print(platform.architecture())
-    #     # #
-    #     # #     # elevate(show_console=False)
-    #     # # # elevate(graphical=True)
-    #     #     # applescript.AppleScript('display dialog "程序需要完整磁盘权限，App need full disk access." giving up after 2').run()
-    #     #     # webbrowser.open('x-apple.systempreferences:com.apple.preference.security?Privacy')
-    #     #     # print("This program must be run as root.Or aborting.")
-    #     #     # cmd = os.fspath(Path(__file__).resolve().parent / "src/run.sh")
-    #     #     # os.system(cmd)
-    #     #     # os.system("open -a Terminal .")
-    #     #     applescript.AppleScript('display dialog "程序需要输入用户密码，App need input user password." giving up after 2').run()
-    #     #     applescript.AppleScript('''tell application "Terminal"
-    #     #                                     activate
-    #     #                                     set newTab to do script "sudo /Applications/kontakt-tool.app/Contents/MacOS/kontakt-tool"
-    #     #                                  end tell
-    #     #                             '''
-    #     #                             ).run()
-    #     #     sys.exit(-1)
-    #
-    # # #   计算机的网络名称，’acer-PC’
-    # # print(platform.node())
-    # #
-    # # # 获取操作系统名称及版本号，’Windows-7-6.1.7601-SP1′
-    # # print(platform.platform())
-    # osType = str(platform.platform().split("-")[0])
-    # # 计算机处理器信息，’Intel64 Family 6 Model 42 Stepping 7, GenuineIntel’
-    # cpuType=platform.processor().split(" ")[0]
-    #
-    # # # 获取操作系统中Python的构建日期
-    # # print(platform.python_build())
-    # #
-    # # #  获取系统中python解释器的信息
-    # # print(platform.python_compiler())
-    #
-    # # app = QApplication([])
-    #
-    #
-    #
-    #
-    # appGuid = 'kontakt'
-    # app = QtSingleApplication(appGuid, sys.argv)
-    # if app.isRunning(): sys.exit(0)
-    #
-    #
-    #
-    #
-    #
-    # window = QWidget()
-    # screen = QApplication.primaryScreen()
-    #
-    # app.setStyleSheet(StyleSheet)
-    # window = Widget()
-    # window.show()
-    # window.move((1920-1080)*0.5,100)
-    #
-    # window.doDonate()
-    #
-    #
-    # # print(register.get_disk_info())
-    # # print(register.getCombinNumber())
-    # # print(register.Encryted(register.getCombinNumber()))
-    #
-    # # window.test()
-    # # window.getFullLibs()
-    # # window.open_ni_dir()
-    # sys.exit(app.exec())
+    # #  获取系统中python解释器的信息
+    # print(platform.python_compiler())
+
+    # app = QApplication([])
+
+
+
+
+    appGuid = 'kontakt'
+    app = QtSingleApplication(appGuid, sys.argv)
+    if app.isRunning(): sys.exit(0)
+
+
+
+
+
+    window = QWidget()
+    screen = QApplication.primaryScreen()
+
+    app.setStyleSheet(StyleSheet)
+    window = Widget()
+    window.show()
+    window.move((1920-1080)*0.5,100)
+
+    window.doDonate()
+
+
+    # print(register.get_disk_info())
+    # print(register.getCombinNumber())
+    # print(register.Encryted(register.getCombinNumber()))
+
+    # window.test()
+    # window.getFullLibs()
+    # window.open_ni_dir()
+    sys.exit(app.exec())
 
 
 
