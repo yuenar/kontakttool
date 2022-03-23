@@ -4,6 +4,7 @@
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtNetwork import *
+# from PySide6.QtWidgets import QApplication
 from PySide6.QtWidgets import *
 
 class QtSingleApplication(QApplication):

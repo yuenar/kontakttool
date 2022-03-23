@@ -350,8 +350,20 @@ if __name__ == "__main__":
         isWindows = False
         TARGET_XML_DIR = TARGET_MAC_XML_DIR
 
+
+    register = RegisterClass()
+    # print(register.get_disk_info())
+    # print(register.get_network_info())
+    # print(register.get_mainboard_info())
+    print("===================================================")
+    print(register.getCombinNumber())
+
     if isWindows:
         # print(platform.architecture())
+        #
+        # # #   计算机的网络名称，’acer-PC’
+        # print(platform.node())
+
 
         elevate(show_console=False)
         akeyHandle = CreateKey(HKEY_LOCAL_MACHINE, subDir)
@@ -397,9 +409,15 @@ if __name__ == "__main__":
     # print(platform.python_compiler())
 
     # app = QApplication([])
-    appGuid = 'F3FF80BA-BA05-4277-8063-82A6DB9245A2'
+
+
+
+
+    appGuid = 'kontakt'
     app = QtSingleApplication(appGuid, sys.argv)
     if app.isRunning(): sys.exit(0)
+
+
 
     window = QWidget()
     screen = QApplication.primaryScreen()
@@ -409,6 +427,11 @@ if __name__ == "__main__":
     window.show()
     window.move((1920-1080)*0.5,100)
     window.doDonate()
+
+
+    # print(register.get_disk_info())
+    # print(register.getCombinNumber())
+    # print(register.Encryted(register.getCombinNumber()))
 
     # window.test()
     # window.getFullLibs()

@@ -26,7 +26,7 @@ import base64
 from pyDes import *
 
 
-class register:
+class RegisterClass:
     def __init__(self):
         self.Des_Key = "DESCRYPT"  # Key
         self.Des_IV = "\x15\1\x2a\3\1\x23\2\0"  # 自定IV向量
