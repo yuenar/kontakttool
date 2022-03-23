@@ -8,10 +8,10 @@ import os,sys
 from config import *
 from biplist import *
 
-from winreg import *
-# 1.连接注册表根键，以HKEY_LOCAL_MACHINE为例
-regRoot = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
-regUser = ConnectRegistry(None, HKEY_CURRENT_USER)
+# from winreg import *
+# # 1.连接注册表根键，以HKEY_LOCAL_MACHINE为例
+# regRoot = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
+# regUser = ConnectRegistry(None, HKEY_CURRENT_USER)
 
 # 功能说明： 用户运行程序后自动检测认证状态：
 #  1. 检测到有注册文件时，注册文件中的注册码和DES+base64加密的注册码比较，若一致，则通过认证，进入主程序。
