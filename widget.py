@@ -235,6 +235,9 @@ class Widget(QWidget):
         self.setLayout(mainLay)
 
     def getFullLibs(self):
+        if not os.path.exists(TARGET_XML_DIR):
+            os.makedirs(TARGET_XML_DIR)
+
         if isWindows:
 
             keyHandle = OpenKey(HKEY_LOCAL_MACHINE, subDir)
@@ -263,9 +266,6 @@ class Widget(QWidget):
         else:
             if not os.path.exists(TARGET_PLIST_DIR):
                os.makedirs(TARGET_PLIST_DIR)
-
-            if not os.path.exists(TARGET_XML_DIR):
-               os.makedirs(TARGET_XML_DIR)
 
             list=list_all_files(TARGET_XML_DIR)
             for fullname in list:  # 循环读取每一行，1：是从第二行开始
@@ -351,19 +351,12 @@ if __name__ == "__main__":
         TARGET_XML_DIR = TARGET_MAC_XML_DIR
 
 
-    register = RegisterClass()
-    # print(register.get_disk_info())
-    # print(register.get_network_info())
-    # print(register.get_mainboard_info())
-    # print("===================================================")
 
-    # print(register.getCombinNumber())
-    # print("--------------------------------------------------")
-    idcode=bytes(register.getCombinNumber(), encoding = "utf8")
-    print(idcode)
-    print("===================================================")
-    regcode=str(register.Encrypted(idcode))
-    print(regcode)
+    # # # print(register.Encrypted(idcode))
+    # print(regcode)
+    # register.regist(regcode)
+
+
 
 
 
@@ -376,6 +369,7 @@ if __name__ == "__main__":
 
 
         elevate(show_console=False)
+
         akeyHandle = CreateKey(HKEY_LOCAL_MACHINE, subDir)
         akey1Handle = CreateKey(HKEY_CURRENT_USER, subDir)
         CloseKey(akeyHandle)
@@ -418,6 +412,21 @@ if __name__ == "__main__":
     # #  获取系统中python解释器的信息
     # print(platform.python_compiler())
 
+    register = RegisterClass()
+    # # print(register.get_disk_info())
+    # # print(register.get_network_info())
+    # # print(register.get_mainboard_info())
+    # # print("===================================================")
+    #
+    # # print(register.getCombinNumber())
+    # # print("--------------------------------------------------")
+    idcode=register.getCombinNumber()
+    # # print(idcode)
+    # # print("===================================================")
+    regcode = register.DesEncrypt(idcode)
+    register.regist(regcode)
+
+    # register.checkAuthored()
 
     if isWindows:
         app = QApplication([])
