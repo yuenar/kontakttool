@@ -8,10 +8,11 @@ import os,sys
 from config import *
 from biplist import *
 
-from winreg import *
-# 1.连接注册表根键，以HKEY_LOCAL_MACHINE为例
-regRoot = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
-regUser = ConnectRegistry(None, HKEY_CURRENT_USER)
+# import wmi
+# from winreg import *
+# # 1.连接注册表根键，以HKEY_LOCAL_MACHINE为例
+# regRoot = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
+# regUser = ConnectRegistry(None, HKEY_CURRENT_USER)
 
 # 功能说明： 用户运行程序后自动检测认证状态：
 #  1. 检测到有注册文件时，注册文件中的注册码和DES+base64加密的注册码比较，若一致，则通过认证，进入主程序。
@@ -23,7 +24,7 @@ import base64
 import zlib
 from passlib.hash import sha256_crypt
 
-import wmi
+
 import base64
 import pyDes
 
@@ -33,77 +34,77 @@ class RegisterClass:
         self.Des_Key = "miuzhang"  # Key,需八位
         self.Des_IV = "\x11\2\x2a\3\1\x27\2\0"  # 自定IV向量
 
-    # 获取硬件信息，输出macode
-    # 1、CPU序列号（ID）  2、本地连接 无线局域网 以太网的MAC  3.硬盘序列号（唯一） 4.主板序列号（唯一）
-    global s
-    s = wmi.WMI()
-
-    # cpu序列号
-    def get_CPU_info(self):
-        cpu = []
-        cp = s.Win32_Processor()
-        for u in cp:
-            cpu.append(
-                {
-                    "Name": u.Name,
-                    "Serial Number": u.ProcessorId,
-                    "CoreNum": u.NumberOfCores
-                }
-            )
-        return cpu
-
-    # 硬盘序列号
-    def get_disk_info(self):
-        disk = []
-        for pd in s.Win32_DiskDrive():
-            disk.append(
-                {
-                    "Serial": s.Win32_PhysicalMedia()[0].SerialNumber.lstrip().rstrip(),  # 获取硬盘序列号，调用另外一个win32 API
-                    "ID": pd.deviceid,
-                    "Caption": pd.Caption,
-                    "size": str(int(float(pd.Size) / 1024 / 1024 / 1024))
-                }
-            )
-        return disk
-
-    # mac地址（包括虚拟机的）
-    def get_network_info(self):
-        network = []
-        for nw in s.Win32_NetworkAdapterConfiguration():
-            if nw.MacAddress != None:
-                network.append(
-                    {
-                        "MAC": nw.MacAddress,
-                        "ip": nw.IPAddress
-                    }
-                )
-        return network
-
-    # 主板序列号
-    def get_mainboard_info(self):
-        mainboard = []
-        for board_id in s.Win32_BaseBoard():
-            mainboard.append(board_id.SerialNumber.strip().strip('.'))
-        return mainboard
-
-    #  由于机器码太长，故选取机器码字符串部分字符
-    #  E0:DB:55:B5:9C:16BFEBFBFF00040651W3P0VKEL6W8T1Z1.CN762063BN00A8
-    #  1 61 k 8Z
+    # # 获取硬件信息，输出macode
+    # # 1、CPU序列号（ID）  2、本地连接 无线局域网 以太网的MAC  3.硬盘序列号（唯一） 4.主板序列号（唯一）
+    # global s
+    # s = wmi.WMI()
+    #
+    # # cpu序列号
+    # def get_CPU_info(self):
+    #     cpu = []
+    #     cp = s.Win32_Processor()
+    #     for u in cp:
+    #         cpu.append(
+    #             {
+    #                 "Name": u.Name,
+    #                 "Serial Number": u.ProcessorId,
+    #                 "CoreNum": u.NumberOfCores
+    #             }
+    #         )
+    #     return cpu
+    #
+    # # 硬盘序列号
+    # def get_disk_info(self):
+    #     disk = []
+    #     for pd in s.Win32_DiskDrive():
+    #         disk.append(
+    #             {
+    #                 "Serial": s.Win32_PhysicalMedia()[0].SerialNumber.lstrip().rstrip(),  # 获取硬盘序列号，调用另外一个win32 API
+    #                 "ID": pd.deviceid,
+    #                 "Caption": pd.Caption,
+    #                 "size": str(int(float(pd.Size) / 1024 / 1024 / 1024))
+    #             }
+    #         )
+    #     return disk
+    #
+    # # mac地址（包括虚拟机的）
+    # def get_network_info(self):
+    #     network = []
+    #     for nw in s.Win32_NetworkAdapterConfiguration():
+    #         if nw.MacAddress != None:
+    #             network.append(
+    #                 {
+    #                     "MAC": nw.MacAddress,
+    #                     "ip": nw.IPAddress
+    #                 }
+    #             )
+    #     return network
+    #
+    # # 主板序列号
+    # def get_mainboard_info(self):
+    #     mainboard = []
+    #     for board_id in s.Win32_BaseBoard():
+    #         mainboard.append(board_id.SerialNumber.strip().strip('.'))
+    #     return mainboard
+    #
+    # #  由于机器码太长，故选取机器码字符串部分字符
+    # #  E0:DB:55:B5:9C:16BFEBFBFF00040651W3P0VKEL6W8T1Z1.CN762063BN00A8
+    # #  1 61 k 8Z
+    # #     machinecode_str = ""
+    # #     machinecode_str = machinecode_str+a[0]['MAC']+b[0]['Serial Number']+c[0]['Serial']+d[0]
+    # def getCombinNumber(self):
+    #     a = self.get_network_info()
+    #     b = self.get_CPU_info()
+    #     c = self.get_disk_info()
+    #     d = self.get_mainboard_info()
     #     machinecode_str = ""
-    #     machinecode_str = machinecode_str+a[0]['MAC']+b[0]['Serial Number']+c[0]['Serial']+d[0]
-    def getCombinNumber(self):
-        a = self.get_network_info()
-        b = self.get_CPU_info()
-        c = self.get_disk_info()
-        d = self.get_mainboard_info()
-        machinecode_str = ""
-        machinecode_str = machinecode_str + a[0]['MAC'] + b[0]['Serial Number'] + c[0]['Serial'] + d[0]
-        selectindex = [15, 30, 32, 38, 43, 46]
-        macode = ""
-        for i in selectindex:
-            macode = macode + machinecode_str[i]
-        ###   print(macode)
-        return macode
+    #     machinecode_str = machinecode_str + a[0]['MAC'] + b[0]['Serial Number'] + c[0]['Serial'] + d[0]
+    #     selectindex = [15, 30, 32, 38, 43, 46]
+    #     macode = ""
+    #     for i in selectindex:
+    #         macode = macode + machinecode_str[i]
+    #     ###   print(macode)
+    #     return macode
 
 
     def DesEncrypt(self, str):

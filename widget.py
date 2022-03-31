@@ -370,10 +370,10 @@ if __name__ == "__main__":
 
         elevate(show_console=False)
 
-        akeyHandle = CreateKey(HKEY_LOCAL_MACHINE, subDir)
-        akey1Handle = CreateKey(HKEY_CURRENT_USER, subDir)
-        CloseKey(akeyHandle)
-        CloseKey(akey1Handle)
+        # akeyHandle = CreateKey(HKEY_LOCAL_MACHINE, subDir)
+        # akey1Handle = CreateKey(HKEY_CURRENT_USER, subDir)
+        # CloseKey(akeyHandle)
+        # CloseKey(akey1Handle)
     else:
 	    elevate()
 
@@ -412,35 +412,32 @@ if __name__ == "__main__":
     # #  获取系统中python解释器的信息
     # print(platform.python_compiler())
 
-    register = RegisterClass()
-    # # print(register.get_disk_info())
-    # # print(register.get_network_info())
-    # # print(register.get_mainboard_info())
-    # # print("===================================================")
-    #
-    # # print(register.getCombinNumber())
-    # # print("--------------------------------------------------")
-    idcode=register.getCombinNumber()
-    # # print(idcode)
-    # # print("===================================================")
-    regcode = register.DesEncrypt(idcode)
-    register.regist(regcode)
+    # register = RegisterClass()
+    # # # print(register.get_disk_info())
+    # # # print(register.get_network_info())
+    # # # print(register.get_mainboard_info())
+    # # # print("===================================================")
+    # #
+    # # # print(register.getCombinNumber())
+    # # # print("--------------------------------------------------")
+    # idcode=register.getCombinNumber()
+    # # # print(idcode)
+    # # # print("===================================================")
+    # regcode = register.DesEncrypt(idcode)
+    # register.regist(regcode)
 
     # register.checkAuthored()
 
-    if isWindows:
-        app = QApplication([])
-    else:
-        appGuid = 'kontakt'+register.getCombinNumber()
-        app = QtSingleApplication(appGuid, sys.argv)
-        if app.isRunning():
-            # app.activationWindow()
-            sys.exit(0)
+    # if isWindows:
+    #     app = QApplication([])
+    # else:
+    #     appGuid = 'kontakt'
+    #     app = QtSingleApplication(appGuid, sys.argv)
+    #     if app.isRunning():
+    #         # app.activationWindow()
+    #         sys.exit(0)
 
-
-
-
-
+    app = QApplication([])
     window = QWidget()
     screen = QApplication.primaryScreen()
 
