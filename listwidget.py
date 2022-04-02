@@ -27,10 +27,26 @@ class ItemWidget(QWidget):
             if not os.path.exists(ps):
                 pic=ps.replace(".png",".jpg")
                 if not os.path.exists(pic):
-                    line = QLineEdit(text, self)
-                    line.setFixedSize(QSize(340, 60))
-                    line.setReadOnly(True)
-                    layout.addWidget(line)
+                    # line = QLineEdit(text, self)
+                    # line.setFixedSize(QSize(340, 60))
+                    # line.setReadOnly(True)
+                    # layout.addWidget(line)
+
+                    lab = QLabel(self)
+                    lab.setFixedSize(QSize(340, 60))
+                    if len(text) < 20:
+                        src = os.fspath(Path(__file__).resolve().parent / "src/wallpaper1.png")
+                    else:
+                        src = os.fspath(Path(__file__).resolve().parent / "src/wallpaper.png")
+                    img = QImage(src)
+                    apix = QPixmap(340, 60)
+                    p = QPainter(apix)
+                    p.drawImage(apix.rect(), img.scaled(340, 60))
+                    p.drawText(5, 50, text)
+                    p.end()
+                    lab.setPixmap(apix)
+                    layout.addWidget(lab)
+
                 else:
                     # print("jpg path:" + pic)
                     lab = QLabel(self)

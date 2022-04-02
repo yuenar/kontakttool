@@ -6,7 +6,7 @@ import random
 from pathlib import Path
 from utiltool import create_nicnt
 from PySide6.QtWidgets import QPushButton, QWidget,QFileDialog,QLineEdit, QTextBrowser,QMessageBox
-from PySide6.QtGui import QRegularExpressionValidator,QImage
+from PySide6.QtGui import QRegularExpressionValidator,QImage,QPainter,QPixmap
 from PySide6.QtCore import QFile,QRegularExpression, Signal
 from PySide6.QtUiTools import QUiLoader
 
@@ -166,9 +166,17 @@ class PWidget(QWidget):
             outPic = self.ole.text() + "/wallpaper.png"
 
             if not os.path.exists(self.wle.text()):
-                src=os.fspath(Path(__file__).resolve().parent /"src/wallpaper.png")
+                if len(self.ble.text()) < 20:
+                    src = os.fspath(Path(__file__).resolve().parent / "src/wallpaper1.png")
+                else:
+                    src = os.fspath(Path(__file__).resolve().parent / "src/wallpaper.png")
                 img=QImage(src)
-                img.scaled(382, 100).save(outPic)
+                pix= QPixmap(340,60)
+                p=QPainter(pix)
+                p.drawImage(pix.rect(),img.scaled(340,60))
+                p.drawText(5,50,self.ble.text())
+                p.save(outPic)
+                p.end()
             else:
                 img=QImage(self.wle.text())
                 img.scaled(382,100).save(outPic)
