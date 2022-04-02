@@ -361,21 +361,22 @@ if __name__ == "__main__":
 
 
 
-    if isWindows:
-        # print(platform.architecture())
-        #
-        # # #   计算机的网络名称，’acer-PC’
-        # print(platform.node())
-
-
-        elevate(show_console=False)
-
-        # akeyHandle = CreateKey(HKEY_LOCAL_MACHINE, subDir)
-        # akey1Handle = CreateKey(HKEY_CURRENT_USER, subDir)
-        # CloseKey(akeyHandle)
-        # CloseKey(akey1Handle)
-    else:
-	    elevate()
+    # if isWindows:
+    #     # print(platform.architecture())
+    #     #
+    #     # # #   计算机的网络名称，’acer-PC’
+    #     # print(platform.node())
+    #
+    #
+    #     elevate(show_console=False)
+    #
+    #     # akeyHandle = CreateKey(HKEY_LOCAL_MACHINE, subDir)
+    #     # akey1Handle = CreateKey(HKEY_CURRENT_USER, subDir)
+    #     # CloseKey(akeyHandle)
+    #     # CloseKey(akey1Handle)
+    # else:
+	#     elevate()
+    # elevate()
 
         # if os.geteuid() != 0:
         # #     # print(platform.architecture())
@@ -428,16 +429,16 @@ if __name__ == "__main__":
 
     # register.checkAuthored()
 
-    # if isWindows:
-    #     app = QApplication([])
-    # else:
-    #     appGuid = 'kontakt'
-    #     app = QtSingleApplication(appGuid, sys.argv)
-    #     if app.isRunning():
-    #         # app.activationWindow()
-    #         sys.exit(0)
+    if isWindows:
+        app = QApplication([])
+    else:
+        appGuid = 'kontakt'
+        app = QtSingleApplication(appGuid, sys.argv)
+        if app.isRunning():
+            # app.activationWindow()
+            sys.exit(0)
 
-    app = QApplication([])
+    # app = QApplication([])
     window = QWidget()
     screen = QApplication.primaryScreen()
 

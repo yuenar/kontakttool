@@ -124,6 +124,9 @@ subDir = r'SOFTWARE\Native Instruments'
 TARGET_MAC_XML_DIR = "/Library/Application Support/Native Instruments/Service Center"
 TARGET_WIN_XML_DIR = "C:\\Program Files\\Common Files\\Native Instruments\\Service Center"
 TARGET_PLIST_PATH = "/Library/Preferences/com.native-instruments."
+
+TARGET_MAC_ICON_DIR = "/Library/Application Support/Native Instruments/owenzhang/PAResources/image/owenzhang"
+
 # TARGET_PLIST_DIR = "/Volumes/misc/test/Preferences"
 # TARGET_XML_DIR = "/Volumes/misc/test/Service Center"
 
