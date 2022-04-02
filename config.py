@@ -126,7 +126,7 @@ TARGET_WIN_XML_DIR = "C:\\Program Files\\Common Files\\Native Instruments\\Servi
 TARGET_PLIST_PATH = "/Library/Preferences/com.native-instruments."
 
 TARGET_MAC_ICON_DIR = "/Library/Application Support/Native Instruments/owenzhang/PAResources/image/owenzhang"
-
+TARGET_MAC_LIST = "/Library/Application Support/Native Instruments/kontakt.ls"
 # TARGET_PLIST_DIR = "/Volumes/misc/test/Preferences"
 # TARGET_XML_DIR = "/Volumes/misc/test/Service Center"
 

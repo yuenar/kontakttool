@@ -265,6 +265,19 @@ def judge_ktxml(apath):
 	    else:
 	        return ""
 
+def judge_plist(apath):
+    list=list_all_files(TARGET_PLIST_DIR)
+    picPath=""
+    for fullname in list:  # mac
+        if apath in fullname:
+            # print(line)
+            plist= readPlist(fullname)
+            picPath="/Volumes/"+plist['ContentDir'].replace(":","/")+"wallpaper.png"
+            break
+
+
+    return picPath
+
 def create_nicnt(compyName,libName,snpid,path):
     if os.path.isdir(path):
         src = os.fspath(Path(__file__).resolve().parent /"src/Source.nicnt")
