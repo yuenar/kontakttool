@@ -7,6 +7,7 @@ from PySide6.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QPushButton, \
 from PySide6.QtGui import QPixmap, QImage,QPainter,QBrush
 
 from config import *
+from utiltool import *
 
 class ItemWidget(QWidget):
     itemDeleted = pyqtSignal(QListWidgetItem)
@@ -22,32 +23,65 @@ class ItemWidget(QWidget):
 
         path=TARGET_MAC_ICON_DIR.replace("owenzhang",text)
         if not os.path.exists(path):
-            line=QLineEdit(text, self)
-            line.setFixedSize(QSize(340, 40))
-            line.setReadOnly(True)
-            layout.addWidget(line)
+            ps=judge_plist(text)
+            if not os.path.exists(ps):
+                pic=ps.replace(".png",".jpg")
+                if not os.path.exists(pic):
+                    line = QLineEdit(text, self)
+                    line.setFixedSize(QSize(340, 60))
+                    line.setReadOnly(True)
+                    layout.addWidget(line)
+                else:
+                    # print("jpg path:" + pic)
+                    lab = QLabel(self)
+                    lab.setFixedSize(QSize(340, 60))
+                    img = QImage(pic)
+                    rect = QRect(0,0,340, 60)
+                    pi = QPixmap(510, 60)
+                    pt = QPainter(pi)
+                    pt.setRenderHint(QPainter.Antialiasing)
+                    pt.fillRect(QRect(0, 0, 510, 60), QBrush("#CBD1D5"))
+                    pt.drawImage(rect, img.scaled(340,60))
+                    pt.end()
+                    lab.setPixmap(pi)
+                    layout.addWidget(lab)
+            else:
+                # print("png path:" + ps)
+                pic=ps
+                lab = QLabel(self)
+                lab.setFixedSize(QSize(340, 60))
+                img = QImage(pic)
+                rect = QRect(0,0,340, 60)
+                pi = QPixmap(510, 60)
+                pt = QPainter(pi)
+                pt.setRenderHint(QPainter.Antialiasing)
+                pt.fillRect(QRect(0, 0, 510, 60), QBrush("#CBD1D5"))
+                pt.drawImage(rect, img.scaled(340,60))
+                pt.end()
+                lab.setPixmap(pi)
+                layout.addWidget(lab)
         else:
             lab = QLabel(self)
-            lab.setFixedSize(QSize(340, 40))
+            lab.setFixedSize(QSize(340, 60))
             bpath=path+"/MST_artwork.png"
             ipath=path+"/MST_logo.png"
             # wpath=path+"/wallpaper.png"
             img1=QImage(bpath)
             img2=QImage(ipath)
-            rect =QRect(img1.rect())
+            rect =QRect(0,0,340,60)
             pix = QPixmap(510, 60)
             pt =QPainter(pix)
             pt.setRenderHint(QPainter.Antialiasing)
             pt.fillRect(QRect(0,0,510, 60), QBrush("#CBD1D5"))
-            pt.drawImage(rect,img1)
-            pt.drawImage(rect,img2)
+            pt.drawImage(rect,img1.scaled(340,60))
+            pt.drawImage(rect,img2.scaled(340,60))
             pt.end()
             # pt.save(wpath)
             lab.setPixmap(pix)
             layout.addWidget(lab)
 
         btn=QPushButton('x ', self, clicked=self.doDeleteItem)
-        btn.setFixedSize(QSize(40, 40))
+        btn.setFixedSize(QSize(60, 60))
         layout.addWidget(btn)
 
     def doDeleteItem(self):
