@@ -286,10 +286,10 @@ class Widget(QWidget):
             return
 
         item = QListWidgetItem(self.listWidget)
-        item.setSizeHint(QSize(380, 42))
+        item.setSizeHint(QSize(380, 62))
         # widget = ItemWidget('已导入Exist:    {}'.format(n), item, self.listWidget)
         widget = ItemWidget('{}'.format(n), item, self.listWidget)
-        widget.setFixedSize(QSize(380, 42))
+        widget.setFixedSize(QSize(380, 62))
         # 绑定删除信号
         widget.itemDeleted.connect(self.doDeleteItem)
         self.listWidget.setItemWidget(item, widget)
@@ -376,7 +376,7 @@ if __name__ == "__main__":
     #     # CloseKey(akey1Handle)
     # else:
 	#     elevate()
-    # elevate()
+    elevate()
 
         # if os.geteuid() != 0:
         # #     # print(platform.architecture())
