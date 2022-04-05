@@ -175,7 +175,7 @@ class PWidget(QWidget):
                 img=QImage(src)
                 pix= QPixmap(340,60)
                 p=QPainter(pix)
-                p.setPen("#34495E")
+                p.setPen("#FFFFFF")
                 p.drawImage(pix.rect(),img.scaled(340,60))
                 p.drawText(35,50,self.ble.text())
                 p.end()
