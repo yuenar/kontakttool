@@ -46,6 +46,7 @@ class ItemWidget(QWidget):
                     p.drawImage(apix.rect(), img.scaled(340, 60))
                     p.drawText(35, 50, text)
                     p.end()
+                    apix.save(ps)
                     lab.setPixmap(apix)
                     layout.addWidget(lab)
 
@@ -60,6 +61,7 @@ class ItemWidget(QWidget):
                     pt.setRenderHint(QPainter.Antialiasing)
                     pt.fillRect(QRect(0, 0, 510, 60), QBrush("#CBD1D5"))
                     pt.drawImage(rect, img.scaled(340,60))
+                    pt.drawText(35, 50, text)
                     pt.end()
                     lab.setPixmap(pi)
                     layout.addWidget(lab)
@@ -75,6 +77,7 @@ class ItemWidget(QWidget):
                 pt.setRenderHint(QPainter.Antialiasing)
                 pt.fillRect(QRect(0, 0, 510, 60), QBrush("#CBD1D5"))
                 pt.drawImage(rect, img.scaled(340,60))
+                pt.drawText(35, 50, text)
                 pt.end()
                 lab.setPixmap(pi)
                 layout.addWidget(lab)
