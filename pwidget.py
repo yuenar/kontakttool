@@ -176,7 +176,7 @@ class PWidget(QWidget):
                 pix= QPixmap(340,60)
                 p=QPainter(pix)
                 p.drawImage(pix.rect(),img.scaled(340,60))
-                p.drawText(5,50,self.ble.text())
+                p.drawText(35,50,self.ble.text())
                 p.save(outPic)
                 p.end()
             else:

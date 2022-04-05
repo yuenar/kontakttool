@@ -44,7 +44,7 @@ class ItemWidget(QWidget):
                     apix = QPixmap(340, 60)
                     p = QPainter(apix)
                     p.drawImage(apix.rect(), img.scaled(340, 60))
-                    p.drawText(5, 50, text)
+                    p.drawText(35, 50, text)
                     p.end()
                     lab.setPixmap(apix)
                     layout.addWidget(lab)
