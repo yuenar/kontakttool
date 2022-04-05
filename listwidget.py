@@ -34,10 +34,12 @@ class ItemWidget(QWidget):
 
                     lab = QLabel(self)
                     lab.setFixedSize(QSize(340, 60))
-                    if len(text) < 20:
+                    if len(text) < 10:
+                        src = os.fspath(Path(__file__).resolve().parent / "src/wallpaper.png")
+                    elif len(text) < 20:
                         src = os.fspath(Path(__file__).resolve().parent / "src/wallpaper1.png")
                     else:
-                        src = os.fspath(Path(__file__).resolve().parent / "src/wallpaper.png")
+                        src = os.fspath(Path(__file__).resolve().parent / "src/wallpaper2.png")
                     img = QImage(src)
                     apix = QPixmap(340, 60)
                     p = QPainter(apix)

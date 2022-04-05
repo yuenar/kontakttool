@@ -166,10 +166,12 @@ class PWidget(QWidget):
             outPic = self.ole.text() + "/wallpaper.png"
 
             if not os.path.exists(self.wle.text()):
-                if len(self.ble.text()) < 20:
+                if len(self.ble.text()) < 10:
+                    src = os.fspath(Path(__file__).resolve().parent / "src/wallpaper.png")
+                elif len(self.ble.text()) < 20:
                     src = os.fspath(Path(__file__).resolve().parent / "src/wallpaper1.png")
                 else:
-                    src = os.fspath(Path(__file__).resolve().parent / "src/wallpaper.png")
+                    src = os.fspath(Path(__file__).resolve().parent / "src/wallpaper2.png")
                 img=QImage(src)
                 pix= QPixmap(340,60)
                 p=QPainter(pix)

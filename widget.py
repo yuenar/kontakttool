@@ -438,10 +438,6 @@ if __name__ == "__main__":
             # app.activationWindow()
             sys.exit(0)
 
-    # app = QApplication([])
-    window = QWidget()
-    screen = QApplication.primaryScreen()
-
     app.setStyleSheet(StyleSheet)
     window = Widget()
     window.show()

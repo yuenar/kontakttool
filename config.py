@@ -6,7 +6,7 @@ import re
 import os,sys
 from pathlib import Path
 
-isWindows= True
+isWindows= False
 cpuType = "Intel"
 osType = "Mac"
 bankCounts=0
