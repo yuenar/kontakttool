@@ -4,7 +4,7 @@
 from PySide6.QtCore import QSize, Signal as pyqtSignal,QRect
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QPushButton, \
     QListWidgetItem,QLabel
-from PySide6.QtGui import QPixmap, QImage,QPainter,QBrush
+from PySide6.QtGui import QPixmap, QImage,QPainter,QBrush,QPen
 
 from config import *
 from utiltool import *
@@ -43,6 +43,7 @@ class ItemWidget(QWidget):
                     img = QImage(src)
                     apix = QPixmap(340, 60)
                     p = QPainter(apix)
+                    p.setPen("#34495E")
                     p.drawImage(apix.rect(), img.scaled(340, 60))
                     p.drawText(35, 50, text)
                     p.end()
@@ -58,6 +59,7 @@ class ItemWidget(QWidget):
                     rect = QRect(0,0,340, 60)
                     pi = QPixmap(510, 60)
                     pt = QPainter(pi)
+                    pt.setPen("#34495E")
                     pt.setRenderHint(QPainter.Antialiasing)
                     pt.fillRect(QRect(0, 0, 510, 60), QBrush("#CBD1D5"))
                     pt.drawImage(rect, img.scaled(340,60))
@@ -74,6 +76,7 @@ class ItemWidget(QWidget):
                 rect = QRect(0,0,340, 60)
                 pi = QPixmap(510, 60)
                 pt = QPainter(pi)
+                pt.setPen("#55E2BF")
                 pt.setRenderHint(QPainter.Antialiasing)
                 pt.fillRect(QRect(0, 0, 510, 60), QBrush("#CBD1D5"))
                 pt.drawImage(rect, img.scaled(340,60))

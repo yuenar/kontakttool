@@ -6,7 +6,7 @@ import random
 from pathlib import Path
 from utiltool import create_nicnt
 from PySide6.QtWidgets import QPushButton, QWidget,QFileDialog,QLineEdit, QTextBrowser,QMessageBox
-from PySide6.QtGui import QRegularExpressionValidator,QImage,QPainter,QPixmap
+from PySide6.QtGui import QRegularExpressionValidator,QImage,QPainter,QPixmap,QPen
 from PySide6.QtCore import QFile,QRegularExpression, Signal
 from PySide6.QtUiTools import QUiLoader
 
@@ -175,6 +175,7 @@ class PWidget(QWidget):
                 img=QImage(src)
                 pix= QPixmap(340,60)
                 p=QPainter(pix)
+                p.setPen("#34495E")
                 p.drawImage(pix.rect(),img.scaled(340,60))
                 p.drawText(35,50,self.ble.text())
                 p.end()
