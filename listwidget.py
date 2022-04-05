@@ -95,7 +95,7 @@ class ItemWidget(QWidget):
             rect =QRect(0,0,340,60)
             pix = QPixmap(510, 60)
             pt =QPainter(pix)
-            pt.setPen("#F02A1A")
+            pt.setPen("#FFFFFF")
             pt.setRenderHint(QPainter.Antialiasing)
             pt.fillRect(QRect(0,0,510, 60), QBrush("#CBD1D5"))
             pt.drawImage(rect,img1.scaled(340,60))
