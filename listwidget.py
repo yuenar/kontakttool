@@ -76,7 +76,7 @@ class ItemWidget(QWidget):
                 rect = QRect(0,0,340, 60)
                 pi = QPixmap(510, 60)
                 pt = QPainter(pi)
-                pt.setPen("#FFFFFF")
+                pt.setPen("#34495E")
                 pt.setRenderHint(QPainter.Antialiasing)
                 pt.fillRect(QRect(0, 0, 510, 60), QBrush("#CBD1D5"))
                 pt.drawImage(rect, img.scaled(340,60))
