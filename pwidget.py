@@ -179,7 +179,6 @@ class PWidget(QWidget):
                 p.drawImage(pix.rect(),img.scaled(340,60))
                 p.drawText(35,50,self.ble.text())
                 p.end()
-                pix.save(outPic)
             else:
                 img=QImage(self.wle.text())
                 img.scaled(382,100).save(outPic)
