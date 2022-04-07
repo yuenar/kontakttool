@@ -215,14 +215,14 @@ class Widget(QWidget):
         self.clearBtn = QPushButton('清空音色 Clear banks', self, objectName="OrangeButton", minimumHeight=48 ,clicked=self.doClearItem)
         hVl.addWidget(self.clearBtn)
 
-        fBtn=QPushButton("导入音色Load banks", self,
-                                     objectName="OrangeButton", minimumHeight=48 ,clicked=self.open_ni_dir)
+        fBtn=QPushButton("导入音色Load bank", self,
+                                     objectName="OrangeButton", minimumHeight=48 ,clicked=self.doLoadBank)
 
-        tBtn=QPushButton("捐赠Donate", self,
+        tBtn=QPushButton("批量导入Load banks", self,
+                                     objectName="OrangeButton", minimumHeight=48 ,clicked=self.doLoadMultiBank)
+
+        oBtn=QPushButton("捐赠Donate", self,
                                      objectName="OrangeButton", minimumHeight=48 ,clicked=self.doDonate)
-
-        oBtn=QPushButton("关注作者Follow me", self,
-                                     objectName="OrangeButton", minimumHeight=48 ,clicked=self.doFollow)
 
         eBtn=QPushButton("访问官网HomePage", self,
                                      objectName="OrangeButton", minimumHeight=48 ,clicked=self.doVisit)
@@ -267,12 +267,12 @@ class Widget(QWidget):
             if not os.path.exists(TARGET_PLIST_DIR):
                os.makedirs(TARGET_PLIST_DIR)
 
-            list=list_all_files(TARGET_XML_DIR)
+            list=list_all_files(TARGET_XML_DIR,True)
             for fullname in list:  # 循环读取每一行，1：是从第二行开始
                 if ".xml" in fullname:
                     self.add2listView(fullname)
 
-            plist=list_all_files(TARGET_PLIST_DIR)
+            plist=list_all_files(TARGET_PLIST_DIR,True)
             for pullname in plist:  # 循环读取每一行，1：是从第二行开始
                 if "com.native-instruments." in pullname:
                     self.plistVector.append(pullname)
@@ -296,7 +296,13 @@ class Widget(QWidget):
         self.list.append(fullname)
         self.updateTile()
 
-    def open_ni_dir(self):
+    def doLoadBank(self):
+        self.open_ni_dir(False)
+
+    def doLoadMultiBank(self):
+        self.open_ni_dir(True)
+
+    def open_ni_dir(self,is_iter):
         if not os.path.exists(TARGET_PLIST_DIR):
            os.makedirs(TARGET_PLIST_DIR)
 
@@ -308,7 +314,7 @@ class Widget(QWidget):
         if len(lib_dir)<1:
             return
 
-        list = list_all_files(lib_dir)
+        list = list_all_files(lib_dir,is_iter)
         if isWindows :
             for fullname in list:  # 循环读取每一行，1：是从第二行开始
                 if ".nicnt" in fullname:

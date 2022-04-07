@@ -266,7 +266,7 @@ def judge_ktxml(apath):
 	        return ""
 
 def judge_plist(apath):
-    list=list_all_files(TARGET_PLIST_DIR)
+    list=list_all_files(TARGET_PLIST_DIR,True)
     picPath=""
     for fullname in list:  # mac
         if apath in fullname:
@@ -295,14 +295,24 @@ def create_nicnt(compyName,libName,snpid,path):
         # print("done")
         return fullpath
 
-def list_all_files(rootdir):
+def list_all_files(rootdir,is_iter):
 
     _files = []
     list = os.listdir(rootdir)  # 列出文件夹下所有的目录与文件
     for i in range(0, len(list)):
         path = os.path.join(rootdir, list[i])
-        if os.path.isdir(path):
-            _files.extend(list_all_files(path))
+        if os.path.isdir(path) and is_iter :
+            _files.extend(list_all_files(path,True))
+        if os.path.isfile(path):
+            _files.append(path)
+    return _files
+
+def list_dir_files(rootdir):
+
+    _files = []
+    list = os.listdir(rootdir)  # 列出文件夹下所有的目录与文件
+    for i in range(0, len(list)):
+        path = os.path.join(rootdir, list[i])
         if os.path.isfile(path):
             _files.append(path)
     return _files
