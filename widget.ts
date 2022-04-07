@@ -11,7 +11,7 @@
     <message>
         <location filename="widget.py" line="109"/>
         <source>  Loaded banks:  {}</source>
-        <translation>  已载入：  {} 套音色</translation>
+        <translation>  已载入:  {}套音色</translation>
     </message>
     <message>
         <location filename="widget.py" line="117"/>
