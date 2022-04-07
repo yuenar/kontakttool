@@ -51,7 +51,7 @@ QPushButton {
     border: none; /*去掉边框*/
     background-color: #CBD1D5;
     color:#FFFAFA;
-    font: bold 
+    font: bold italic 16px
 }
 /*
 QPushButton#xxx

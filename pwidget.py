@@ -16,22 +16,22 @@ class PWidget(QWidget):
         super(PWidget, self).__init__()
         self.load_ui()
         self.dialog = QFileDialog()
-        wpBtn=QPushButton("打开Broswer", self,
+        wpBtn=QPushButton(self.tr("Broswer"), self,
                                      objectName="GreenButton", minimumHeight=32 ,clicked=self.openFolder)
         wpBtn.move(250,280)
         wpBtn.resize(100,36)
 
-        opBtn=QPushButton("选图Take Image", self,
+        opBtn=QPushButton(self.tr("Take Image"), self,
                                      objectName="GreenButton", minimumHeight=32 ,clicked=self.openPic)
         opBtn.move(250,360)
         opBtn.resize(100, 36)
 
-        rBtn=QPushButton("随机填充数据\nGenerate random data ", self,
+        rBtn=QPushButton(self.tr("Generate random data "), self,
                                      objectName="GreenButton", minimumHeight=32 ,clicked=self.doRandom)
         rBtn.move(20,460)
         rBtn.resize(160, 32)
 
-        cBtn=QPushButton("标记并导入非标准库\nMark && Load 3rd Bank ", self,
+        cBtn=QPushButton(self.tr("Mark && Load 3rd Bank "), self,
                                      objectName="GreenButton", minimumHeight=32 ,clicked=self.doCreateNcint)
         cBtn.move(190,460)
         cBtn.resize(160, 32)
@@ -41,25 +41,32 @@ class PWidget(QWidget):
         # hBtn.move(350,460)
         # hBtn.resize(330, 32)
 
+        self.ui.label_bf.setText(self.tr("Bank folder："))
+        self.ui.label_bn.setText(self.tr("BankName："))
+        self.ui.label_sid.setText(self.tr("Snpid："))
+        self.ui.label_wp.setText(self.tr("Wallpaper："))
+        self.ui.label_com.setText(self.tr("CompyName："))
+        self.ui.label_title.setText(self.tr("NICNT Generator"))
+
         vtor=QRegularExpressionValidator()
         vtor.setRegularExpression(QRegularExpression("[^%&',;=?$\x22]+[a-zA-Z0-9]+$"))
 
         self.cle=QLineEdit(self)
-        self.cle.setPlaceholderText("不支持输入中文！Cannot input Chinese！")
+        self.cle.setPlaceholderText(self.tr("Cannot input Chinese！"))
         self.cle.setMaxLength(128)
         self.cle.move(20,60)
         self.cle.resize(330,36)
         self.cle.setValidator(vtor)
 
         self.ble=QLineEdit(self)
-        self.ble.setPlaceholderText("不支持输入中文！Cannot input Chinese！")
+        self.ble.setPlaceholderText(self.tr("Cannot input Chinese！"))
         self.ble.move(20, 150)
         self.ble.setMaxLength(128)
         self.ble.resize(330,36)
         self.ble.setValidator(vtor)
 
         self.sle=QLineEdit(self)
-        self.sle.setPlaceholderText("最多输入4位字符！Enter up to 4 characters！")
+        self.sle.setPlaceholderText(self.tr("Cannot input Chinese！"))
         self.sle.setText("a123")
 
         vtor1=QRegularExpressionValidator()
@@ -70,30 +77,30 @@ class PWidget(QWidget):
         self.sle.resize(330, 36)
 
         self.ole=QLineEdit(self)
-        self.ole.setPlaceholderText("选择非标音色目录，choose a 3rd-bank floder.")
+        self.ole.setPlaceholderText(self.tr("choose a 3rd-bank floder."))
         self.ole.move(20, 320)
         self.ole.resize(330, 36)
 
         self.wle = QLineEdit(self)
-        self.wle.setPlaceholderText("选择一张图片做背景，choose a wallpaper.")
+        self.wle.setPlaceholderText(self.tr("choose a wallpaper."))
         self.wle.move(20, 410)
         self.wle.resize(330, 36)
 
         self.msgBox = QMessageBox()
-        self.msgBox.setWindowTitle('警告Warning')
+        self.msgBox.setWindowTitle(self.tr('Warning'))
         self.msgBox.setIcon(QMessageBox.Warning)
-        self.msgBox.setInformativeText("请检查输入！\nPlease check your input！")
+        self.msgBox.setInformativeText(self.tr("Please check your input！"))
 
     def load_ui(self):
         loader = QUiLoader()
         path = os.fspath(Path(__file__).resolve().parent /"src/form.ui")
         ui_file = QFile(path)
         ui_file.open(QFile.ReadOnly)
-        loader.load(ui_file, self)
+        self.ui = loader.load(ui_file, self)
         ui_file.close()
 
     def openFolder(self):
-        lib_dir = self.dialog.getExistingDirectory(self, "选取文件夹", os.getcwd())
+        lib_dir = self.dialog.getExistingDirectory(self, self.tr("Broswer"), os.getcwd())
         if len(lib_dir) < 1:
             return
 
@@ -103,7 +110,7 @@ class PWidget(QWidget):
 
     def doRandom(self):
         if len(self.ole.text()) <1:
-            self.msgBox.setText("选择非标音色目录!\n choose a 3rd-bank floder！")
+            self.msgBox.setText(self.tr("choose a 3rd-bank floder！"))
             self.msgBox.show()
             return
         else:
@@ -137,7 +144,7 @@ class PWidget(QWidget):
                     self.sle.setText(str(random.randint(210,9999)))
 
     def openPic(self):
-        lib_dir = self.dialog.getOpenFileName(self,"please choose an image file",os.getcwd(),"Image Files(*.jpg *.png )")
+        lib_dir = self.dialog.getOpenFileName(self,self.tr("please choose an image file"),os.getcwd(),"Image Files(*.jpg *.png )")
         if len(lib_dir) < 1:
             return
 
@@ -145,19 +152,19 @@ class PWidget(QWidget):
 
     def doCreateNcint(self):
         if(len(self.cle.text())<1):
-            self.msgBox.setText("公司名不得为空！\nCannot input null！")
+            self.msgBox.setText(self.tr("Cannot input null！"))
             self.msgBox.show()
         elif (len(self.ble.text())<1):
-            self.msgBox.setText("音色名不得为空！\nCannot input null！")
+            self.msgBox.setText(self.tr("Cannot input null！"))
             self.msgBox.show()
         elif (len(self.sle.text())<1):
-            self.msgBox.setText("音色id不得为空！\nCannot input null！")
+            self.msgBox.setText(self.tr("Cannot input null！"))
             self.msgBox.show()
         elif (len(self.ole.text())<1):
-            self.msgBox.setText("路径不得为空！\nCannot input null！")
+            self.msgBox.setText(self.tr("Cannot input null！"))
             self.msgBox.show()
         elif not os.path.exists(self.ole.text()):
-            self.msgBox.setText("路径不存在！\nIs not exist！")
+            self.msgBox.setText(self.tr("Is not exist！"))
             self.msgBox.show()
         else:
             # print("creating...")

@@ -7,7 +7,7 @@ import platform
 import sys
 from pathlib import Path
 
-from PySide6.QtCore import QUrl
+from PySide6.QtCore import QUrl,QTranslator
 from PySide6.QtGui import QDesktopServices, QPixmap
 from PySide6.QtWidgets import QMessageBox, QFileDialog
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QPushButton, \
@@ -24,7 +24,7 @@ import applescript
 class Widget(QWidget):
     def __init__(self):
         QWidget.__init__(self)
-        self.setWindowTitle("音色库管理工具Kontakt Tool by OwenZhang张礼乐  {} - {}".format(osType,cpuType))
+        self.setWindowTitle(self.tr("Kontakt Tool by OwenZhang  {} - {}").format(osType,cpuType))
         self.dialog = QFileDialog()
         self.list=[]
         self.plistVector=[]
@@ -106,7 +106,7 @@ class Widget(QWidget):
         self.updateTile()
 
     def updateTile(self):
-        self.titleLine.setText('  Loaded banks已加载:  {}  套音色'.format(self.listWidget.count()))
+        self.titleLine.setText(self.tr('Loaded banks:  {}').format(self.listWidget.count()))
 
     def doClearItem(self):
         if(self.listWidget.count()<1):
@@ -114,10 +114,10 @@ class Widget(QWidget):
 
         msgBox = QMessageBox(self)
         msgBox.resize(360,240)
-        msgBox.setWindowTitle('警告Warning')
+        msgBox.setWindowTitle(self.tr('Warning'))
         msgBox.setIcon(QMessageBox.Warning)
-        msgBox.setText("是否清空所有入库音色？操作不可还原！\n Clear all banked tones? The operation is irreversible!")
-        okButton = msgBox.addButton(self.tr("确定\nGo on"), QMessageBox.ActionRole)
+        msgBox.setText(self.tr("Clear all banked tones? The operation is irreversible!"))
+        okButton = msgBox.addButton(self.tr("Go on"), QMessageBox.ActionRole)
         okButton.clicked.connect(self.realClear)
         msgBox.exec()
 
@@ -167,12 +167,12 @@ class Widget(QWidget):
     def doDonate(self):
         msgBox = QMessageBox(self)
         msgBox.resize(360,240)
-        msgBox.setWindowTitle("支付宝向我捐赠？\n Donate by alipay?")
-        msgBox.setInformativeText(" 开发不易，感谢支持!\n Development is not easy,\n thanks for the support!")
+        msgBox.setWindowTitle(self.tr("Donate by alipay?"))
+        msgBox.setInformativeText(self.tr("Development is not easy,\n thanks for the support!"))
         src = os.fspath(Path(__file__).resolve().parent /"src/alipay.png")
         p = QPixmap(src)
         msgBox.setIconPixmap(p.scaled(256, 256))
-        palButton = msgBox.addButton(self.tr("Or Paypal\n或贝宝？"), QMessageBox.ActionRole)
+        palButton = msgBox.addButton(self.tr("Or Paypal？"), QMessageBox.ActionRole)
         palButton.clicked.connect(self.paypal)
         msgBox.exec()
 
@@ -212,19 +212,19 @@ class Widget(QWidget):
 
         hVl = QHBoxLayout(self)
         # 清空按钮
-        self.clearBtn = QPushButton('清空音色 Clear banks', self, objectName="OrangeButton", minimumHeight=48 ,clicked=self.doClearItem)
+        self.clearBtn = QPushButton(self.tr('Clear banks'), self, objectName="OrangeButton", minimumHeight=48 ,clicked=self.doClearItem)
         hVl.addWidget(self.clearBtn)
 
-        fBtn=QPushButton("导入音色Load bank", self,
+        fBtn=QPushButton(self.tr("Load bank"), self,
                                      objectName="OrangeButton", minimumHeight=48 ,clicked=self.doLoadBank)
 
-        tBtn=QPushButton("批量导入Load banks", self,
+        tBtn=QPushButton(self.tr("Load banks"), self,
                                      objectName="OrangeButton", minimumHeight=48 ,clicked=self.doLoadMultiBank)
 
-        oBtn=QPushButton("捐赠Donate", self,
+        oBtn=QPushButton(self.tr("Donate"), self,
                                      objectName="OrangeButton", minimumHeight=48 ,clicked=self.doDonate)
 
-        eBtn=QPushButton("访问官网HomePage", self,
+        eBtn=QPushButton(self.tr("HomePage"), self,
                                      objectName="OrangeButton", minimumHeight=48 ,clicked=self.doVisit)
 
         hVl.addWidget(fBtn)
@@ -309,7 +309,7 @@ class Widget(QWidget):
         if not os.path.exists(TARGET_XML_DIR):
            os.makedirs(TARGET_XML_DIR)
 
-        lib_dir = self.dialog.getExistingDirectory(self, "选取文件夹", os.getcwd())
+        lib_dir = self.dialog.getExistingDirectory(self, self.tr("Broswer"), os.getcwd())
 
         if len(lib_dir)<1:
             return
@@ -443,6 +443,11 @@ if __name__ == "__main__":
         if app.isRunning():
             # app.activationWindow()
             sys.exit(0)
+
+    src = os.fspath(Path(__file__).resolve().parent / "src/widget.qm")
+    translator = QTranslator()
+    translator.load(src)
+    app.installTranslator(translator)
 
     app.setStyleSheet(StyleSheet)
     window = Widget()
