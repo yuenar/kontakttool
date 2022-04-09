@@ -20,11 +20,12 @@ from listwidget import *
 from utiltool import *
 from QtSingleApplication import QtSingleApplication
 import applescript
+import locale
 
 class Widget(QWidget):
     def __init__(self):
         QWidget.__init__(self)
-        self.setWindowTitle(self.tr("Kontakt Tool by OwenZhang  {} - {}").format(osType,cpuType))
+        self.setWindowTitle(self.tr("Kontakt Tool by OwenZhang  {} - {}").format(osType,curVersion))
         self.dialog = QFileDialog()
         self.list=[]
         self.plistVector=[]
@@ -104,9 +105,8 @@ class Widget(QWidget):
             self.listWidget.removeItemWidget(item)
             del item
         self.updateTile()
-
     def updateTile(self):
-        self.titleLine.setText(self.tr('Loaded banks:  {}').format(self.listWidget.count()))
+        self.titleLine.setText(self.tr("  Loaded banks:  {}").format(str(self.listWidget.count())))
 
     def doClearItem(self):
         if(self.listWidget.count()<1):
@@ -165,16 +165,16 @@ class Widget(QWidget):
         self.sw.setCurrentIndex(2)
 
     def doDonate(self):
-        msgBox = QMessageBox(self)
-        msgBox.resize(360,240)
-        msgBox.setWindowTitle(self.tr("Donate by alipay?"))
-        msgBox.setInformativeText(self.tr("Development is not easy,\n thanks for the support!"))
+        self.msgBox = QMessageBox(self)
+        self.msgBox.resize(360,240)
+        self.msgBox.setText(self.tr("Donate by alipay?"))
+        self.msgBox.setInformativeText(self.tr("Development is not easy,\n thanks for the support!"))
         src = os.fspath(Path(__file__).resolve().parent /"src/alipay.png")
         p = QPixmap(src)
-        msgBox.setIconPixmap(p.scaled(256, 256))
-        palButton = msgBox.addButton(self.tr("Or Paypal？"), QMessageBox.ActionRole)
+        self.msgBox.setIconPixmap(p.scaled(256, 256))
+        palButton = self.msgBox.addButton(self.tr("Or Paypal？"), QMessageBox.ActionRole)
         palButton.clicked.connect(self.paypal)
-        msgBox.exec()
+        self.msgBox.exec()
 
     def paypal(self):
         QDesktopServices.openUrl(QUrl("https://www.paypal.com/paypalme/yuenar"))
@@ -205,7 +205,14 @@ class Widget(QWidget):
         # //https://y.qq.com/n/ryqq/singer/0044yxPF1Zultc
         firstPageWidget = PWidget()
         firstPageWidget.importPath.connect(self.import3rdLib)
+
+        if "ar_" in curLang:
+            firstPageWidget.setAr(True)
+        else:
+            firstPageWidget.setAr(False)
+
         layout.addWidget(firstPageWidget)
+
 
         mainLay.addLayout(vLay)
         mainLay.addLayout(layout)
@@ -356,7 +363,7 @@ if __name__ == "__main__":
         isWindows = False
         TARGET_XML_DIR = TARGET_MAC_XML_DIR
 
-
+    curLang=locale.getdefaultlocale()[0]
 
     # # # print(register.Encrypted(idcode))
     # print(regcode)
@@ -382,7 +389,7 @@ if __name__ == "__main__":
     #     # CloseKey(akey1Handle)
     # else:
 	#     elevate()
-    elevate()
+    # elevate()
 
         # if os.geteuid() != 0:
         # #     # print(platform.architecture())
@@ -435,6 +442,7 @@ if __name__ == "__main__":
 
     # register.checkAuthored()
 
+
     if isWindows:
         app = QApplication([])
     else:
@@ -444,16 +452,29 @@ if __name__ == "__main__":
             # app.activationWindow()
             sys.exit(0)
 
-    src = os.fspath(Path(__file__).resolve().parent / "src/widget.qm")
+
+    if "zh_CN" in curLang:
+        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4zh_CN.qm")
+    elif "es_" in curLang:
+        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4es.qm")
+    elif "ja_" in curLang:
+        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4jp.qm")
+    elif "ar_" in curLang:
+        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4ar.qm")
+    else:
+        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4en.qm")
+
+        # trs = os.fspath(Path(__file__).resolve().parent / "src/tr4ar.qm")
+
+
     translator = QTranslator()
-    translator.load(src)
+    translator.load(trs)
     app.installTranslator(translator)
 
     app.setStyleSheet(StyleSheet)
     window = Widget()
     window.show()
     window.move((1920-1080)*0.5,100)
-
     window.doDonate()
 
 

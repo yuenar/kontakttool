@@ -16,25 +16,25 @@ class PWidget(QWidget):
         super(PWidget, self).__init__()
         self.load_ui()
         self.dialog = QFileDialog()
-        wpBtn=QPushButton(self.tr("Broswer"), self,
+        self.wpBtn=QPushButton(self.tr("Broswer"), self,
                                      objectName="GreenButton", minimumHeight=32 ,clicked=self.openFolder)
-        wpBtn.move(250,280)
-        wpBtn.resize(100,36)
+        self.wpBtn.move(250,280)
+        self.wpBtn.resize(100,36)
 
-        opBtn=QPushButton(self.tr("Take Image"), self,
+        self.opBtn=QPushButton(self.tr("Take Image"), self,
                                      objectName="GreenButton", minimumHeight=32 ,clicked=self.openPic)
-        opBtn.move(250,360)
-        opBtn.resize(100, 36)
+        self.opBtn.move(250,360)
+        self.opBtn.resize(100, 36)
 
-        rBtn=QPushButton(self.tr("Generate random data "), self,
+        self.rBtn=QPushButton(self.tr("Generate random data "), self,
                                      objectName="GreenButton", minimumHeight=32 ,clicked=self.doRandom)
-        rBtn.move(20,460)
-        rBtn.resize(160, 32)
+        self.rBtn.move(20,460)
+        self.rBtn.resize(160, 32)
 
-        cBtn=QPushButton(self.tr("Mark && Load 3rd Bank "), self,
+        self.cBtn=QPushButton(self.tr("Mark && Load 3rd Bank "), self,
                                      objectName="GreenButton", minimumHeight=32 ,clicked=self.doCreateNcint)
-        cBtn.move(190,460)
-        cBtn.resize(160, 32)
+        self.cBtn.move(190,460)
+        self.cBtn.resize(160, 32)
 
         # hBtn=QPushButton(" ？ ", self,
         #                               objectName="BlueButton",minimumHeight=32 ,clicked=self.doVisit)
@@ -189,3 +189,11 @@ class PWidget(QWidget):
             else:
                 img=QImage(self.wle.text())
                 img.scaled(382,100).save(outPic)
+
+    def setAr(self,flag):
+        if flag:
+            self.opBtn.move(20, 360)
+            self.wpBtn.move(20, 280)
+        else:
+            self.opBtn.move(250,360)
+            self.wpBtn.move(250, 280)

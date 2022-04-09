@@ -11,6 +11,8 @@ cpuType = "Intel"
 osType = "Mac"
 bankCounts=0
 idcode="uni"
+curVersion="1.0.0"
+curLang="zh_CN"
 
 StyleSheet = """
 /*这里是通用设置，所有按钮都有效，不过后面的可以覆盖这个*/
@@ -51,7 +53,7 @@ QPushButton {
     border: none; /*去掉边框*/
     background-color: #CBD1D5;
     color:#FFFAFA;
-    font: bold italic 16px
+    font: bold italic 14px
 }
 /*
 QPushButton#xxx
