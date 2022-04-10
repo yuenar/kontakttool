@@ -389,7 +389,7 @@ if __name__ == "__main__":
     #     # CloseKey(akey1Handle)
     # else:
 	#     elevate()
-    # elevate()
+    elevate()
 
         # if os.geteuid() != 0:
         # #     # print(platform.architecture())
@@ -453,7 +453,7 @@ if __name__ == "__main__":
             sys.exit(0)
 
 
-    # curLang="fr_ar"
+    # curLang="pt_ar"
 
     if "zh_" in curLang:
         if "CN" in curLang:
@@ -470,6 +470,10 @@ if __name__ == "__main__":
         trs = os.fspath(Path(__file__).resolve().parent / "src/tr4de.qm")
     elif "fr_" in curLang:
         trs = os.fspath(Path(__file__).resolve().parent / "src/tr4fr.qm")
+    elif "ru_" in curLang:
+        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4ru.qm")
+    elif "pt_" in curLang:
+        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4pt.qm")
     else:
         trs = os.fspath(Path(__file__).resolve().parent / "src/tr4en.qm")
 
