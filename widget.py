@@ -453,7 +453,7 @@ if __name__ == "__main__":
             sys.exit(0)
 
 
-    curLang="fr_ar"
+    # curLang="fr_ar"
 
     if "zh_" in curLang:
         if "CN" in curLang:
