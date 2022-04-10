@@ -453,18 +453,28 @@ if __name__ == "__main__":
             sys.exit(0)
 
 
-    if "zh_CN" in curLang:
-        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4zh_CN.qm")
+    curLang="fr_ar"
+
+    if "zh_" in curLang:
+        if "CN" in curLang:
+            trs = os.fspath(Path(__file__).resolve().parent / "src/tr4zh_CN.qm")
+        else:
+            trs = os.fspath(Path(__file__).resolve().parent / "src/tr4zh_HK.qm")
     elif "es_" in curLang:
         trs = os.fspath(Path(__file__).resolve().parent / "src/tr4es.qm")
     elif "ja_" in curLang:
         trs = os.fspath(Path(__file__).resolve().parent / "src/tr4jp.qm")
     elif "ar_" in curLang:
         trs = os.fspath(Path(__file__).resolve().parent / "src/tr4ar.qm")
+    elif "de_" in curLang:
+        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4de.qm")
+    elif "fr_" in curLang:
+        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4fr.qm")
     else:
         trs = os.fspath(Path(__file__).resolve().parent / "src/tr4en.qm")
 
         # trs = os.fspath(Path(__file__).resolve().parent / "src/tr4ar.qm")
+
 
 
     translator = QTranslator()

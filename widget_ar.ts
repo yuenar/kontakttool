@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ar" sourcelanguage="en_US">
+<TS version="2.1" language="ar_EG" sourcelanguage="en_US">
 <context>
     <name>Widget</name>
     <message>
@@ -73,7 +73,7 @@
     <message>
         <location filename="widget.py" line="312"/>
         <source>Broswer</source>
-        <translation type="unfinished">المستعرض</translation>
+        <translation type="unfinished">تصفح</translation>
     </message>
 </context>
 <context>
@@ -82,7 +82,7 @@
         <location filename="pwidget.py" line="103"/>
         <location filename="pwidget.py" line="19"/>
         <source>Broswer</source>
-        <translation type="unfinished">المستعرض</translation>
+        <translation type="unfinished">تصفح</translation>
     </message>
     <message>
         <location filename="pwidget.py" line="24"/>
