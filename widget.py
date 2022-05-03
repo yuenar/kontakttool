@@ -159,7 +159,7 @@ class Widget(QWidget):
         self.updateTile()
     def doVisit(self):
         # QDesktopServices.openUrl(QUrl("mailto:yuenar2@gmail.com"))
-        QDesktopServices.openUrl(QUrl("https://tools.pro-music.cn/"))
+        QDesktopServices.openUrl(QUrl("https://yuenar.github.io/kontakt-tool.github.io"))
 
     def doHelper(self):
         self.sw.setCurrentIndex(2)
