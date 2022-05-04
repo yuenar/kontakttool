@@ -4,10 +4,10 @@
 import bs4
 import xmltodict
 import os,sys
-
+import  images
 from config import *
 from biplist import *
-
+from PyQt5.QtCore import QUrl,QDir,QCoreApplication
 # import wmi
 # from winreg import *
 # # 1.连接注册表根键，以HKEY_LOCAL_MACHINE为例
@@ -24,7 +24,7 @@ import base64
 import zlib
 from passlib.hash import sha256_crypt
 
-
+from PyQt5.QtCore import QCoreApplication
 import base64
 import pyDes
 
@@ -103,7 +103,7 @@ class RegisterClass:
     #     macode = ""
     #     for i in selectindex:
     #         macode = macode + machinecode_str[i]
-    #     ###   print(macode)
+    #     ###   #print(macode)
     #     return macode
 
 
@@ -111,14 +111,14 @@ class RegisterClass:
         k = pyDes.des(self.Des_Key, pyDes.CBC, self.Des_IV, pad=None, padmode=pyDes.PAD_PKCS5)
         encryptStr = k.encrypt(str)
         string = base64.b64encode(encryptStr)
-        # print(string)
+        # #print(string)
         return string  # 转base64编码返回
 
     def DesDecrypt(self, string):
         string = base64.b64decode(string)
         k = pyDes.des(self.Des_Key, pyDes.CBC, self.Des_IV, pad=None, padmode=pyDes.PAD_PKCS5)
         decryptStr = k.decrypt(string)
-        # print(decryptStr)
+        # #print(decryptStr)
         return decryptStr
 
     # #des+base64解码
@@ -127,110 +127,13 @@ class RegisterClass:
     #     DecryptStr = k.decrypt(tr)
     #     return base64.b64decode(DecryptStr) #转base64解码返回
 
-    # 获取注册码，验证成功后生成注册文件
-    def regist(self,key_decrypted):
-        # key = input('please input your register code: ')
-        # 由于输入类似“12”这种不符合base64规则的字符串会引起异常，所以需要增加输入判断
-        idcode = self.getCombinNumber()
-        content = self.DesEncrypt(idcode)
-        # # key_decrypted = bytes(key, encoding='utf-8')
-        # key_decrypted = bytes(key, encoding='utf-8')
-        print(content)
-        if content != 0 and key_decrypted != 0:
-            if content != key_decrypted:
-                print("wrong register code, please check and input your register code again:")
-                # self.regist()
-            elif content == key_decrypted:
-                print("register succeed.")
-                if isWindows:
-                    self.regist_win(key_decrypted)
-                else:
-                    self.regist_mac(key_decrypted)
-
-                return True
-            else:
-                return False
-        else:
-            return False
-        # else:
-        #     self.regist()
-        #     return False
-
-    def regist_win(self,key):
-
-        keys=str(key, encoding='utf-8')
-        # 读写文件要加判断
-        f = "kontakt-tool.re"
-        full_new_re = os.path.join(TARGET_WIN_XML_DIR, f)
-
-        with open(full_new_re, 'w') as f:
-            f.write(keys)
-            f.close()
-            print("regist_win:" + keys)
-
-    def regist_mac(self,key):
-        print("regist_mac:"+key)
-        f = "kontakt-tool.re"
-        full_new_re = os.path.join(TARGET_MAC_XML_DIR, f)
-
-        with open(full_new_re, 'w') as f:
-            f.write(key)
-            f.close()
+def get_path(p):
+    s=p.replace("src","images")
+    path=":/"+s
+    #print("======"+path)
+    return path
 
 
-    # 打开程序先调用注册文件，比较注册文件中注册码与此时获取的硬件信息编码后是否一致
-    def checkAuthored(self):
-        ontent = self.getCombinNumber()
-        tent = bytes(ontent, encoding='utf-8')
-        content = self.Encrypted(tent)
-        if isWindows:
-            f = "kontakt-tool.re"
-            rePath = os.path.join(TARGET_WIN_XML_DIR, f)
-        else:
-            f = "kontakt-tool.re"
-            rePath = os.path.join(TARGET_MAC_XML_DIR, f)
-
-
-        # 读写文件要加判断
-        try:
-            # fc = open(rePath, 'x')
-            # if fc:
-            #     print("first using.")
-            #     fc.write(ontent)
-            #     fc.close()
-
-
-            f = open(rePath, 'r')
-            if f:
-                key = f.read()
-                if key:
-                    key_decrypted = bytes(key, encoding='utf-8')  # 注册文件中注册码
-                    ###              print('key_decrypted:',key_decrypted)
-                    ###              print('content:',content)
-                    if key_decrypted:
-                        if key_decrypted == content:
-                            print("register succeed.")
-                            ##      checkAuthoredResult = 1  # 注册文件与机器码一致
-                        else:
-                            ##        checkAuthoredResult = -1 # 注册文件与机器码不一致
-                            print('未找到注册文件，', '请重新输入注册码，', '或发送', ontent, '至17695797270', '重新获取注册码')
-                            self.regist()
-                    else:
-                        ##       checkAuthoredResult = -2     # 注册文件的注册码不能被解析
-                        self.regist()
-                        print('未找到注册文件，', '请重新输入注册码，', '或发送', ontent, '至17695797270', '重新获取注册码')
-                else:
-                    ##         checkAuthoredResult = -3         # 注册文件中不能被读取
-                    self.regist()
-                    print('未找到注册文件，', '请重新输入注册码，', '或发送', ontent, '至17695797270', '重新获取注册码')
-            else:
-                self.regist()
-        except:
-            print('请发送', ontent, '至17695797270', '获取注册码')
-            ##  checkAuthoredResult = 0                      # 未找到注册文件，请重新输入注册码登录
-            self.regist()
-    ##    print(checkAuthoredResult)
-    ##   return checkAuthoredResult
 
 def judge_ktxml(apath):
     if not os.path.isfile(apath):
@@ -249,14 +152,14 @@ def judge_ktxml(apath):
     adata = f.read()
 
     if isWindows:
-        d = xmltodict.parse(adata)
+        d = xml2dict.parse(adata)
         if "Plugin" in d["ProductHints"]["Product"]["Type"]:
             return ""
         else:
             return baseName.replace(".xml" , "")
     else:
 	    d = bs4.BeautifulSoup(adata , 'xml')
-	    # print(d.Type)
+	    # #print(d.Type)
 
 	    if "Content" in str(d.Type):
 	        return baseName.replace(".xml" , "")
@@ -270,7 +173,7 @@ def judge_plist(apath):
     picPath=""
     for fullname in list:  # mac
         if apath in fullname:
-            # print(line)
+            # #print(line)
             plist= readPlist(fullname)
             picPath="/Volumes/"+plist['ContentDir'].replace(":","/")+"wallpaper.png"
             break
@@ -280,7 +183,8 @@ def judge_plist(apath):
 
 def create_nicnt(compyName,libName,snpid,path):
     if os.path.isdir(path):
-        src = os.fspath(Path(__file__).resolve().parent /"src/Source.nicnt")
+        url = os.path.dirname(os.path.abspath(__file__))
+        src=os.path.join(url,"src/Source.nicnt")
         fullname=libName+".nicnt"
         fullpath=os.path.join(path,fullname)
 
@@ -292,7 +196,7 @@ def create_nicnt(compyName,libName,snpid,path):
 
         fp3.close()
         fp4.close()
-        # print("done")
+        # #print("done")
         return fullpath
 
 def list_all_files(rootdir,is_iter):
@@ -325,12 +229,16 @@ def parse_ncint_mac(path):
     libName = baseName.replace(".nicnt", ".")
 
     lines = f.readlines()  # 读取全部内容 ，并以列表方式返回
+
+    if(len(lines)<2):
+        return "",""
+
     newXML = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n'
 
     for line in lines[1:]:  # 循环读取每一行，1：是从第二行开始
         if "</ProductHints>" in line:
             newXML += line
-            # print("find:==============="+line)
+            # #print("find:==============="+line)
             f.close()
             break
         else:
@@ -343,7 +251,7 @@ def parse_ncint_mac(path):
         # 在我们的文本文件中写入替换的数据
         file.write(newXML)
     chmod(full_new_xml, "755")
-    # print("create xml:"+newXML)
+    # #print("create xml:"+newXML)
     d = xmltodict.parse(newXML)
     spath = path.replace(baseName, "").replace("/Volumes/", "").replace("/", ":")
     # # spath=
@@ -366,134 +274,12 @@ def parse_ncint_mac(path):
 
     return full_new_xml, pls
 
-
-def parse_ncint_win(path):
-    # f = open(path, "r", encoding='unicode_escape')
-    f = open(path, "r", encoding="ISO-8859-1")
-    baseName = os.path.basename(path)
-    libName = baseName.replace(".nicnt", ".")
-    rName = baseName.replace(".nicnt", "")
-
-    lines = f.readlines()  # 读取全部内容 ，并以列表方式返回
-    newXML = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n'
-
-    for line in lines[1:]:  # 循环读取每一行，1：是从第二行开始
-        if "</ProductHints>" in line:
-            newXML += line
-            # print("find:==============="+line)
-            f.close()
-            break
-        else:
-            newXML += line
-
-    f = libName + "xml"
-    full_new_xml = os.path.join(TARGET_WIN_XML_DIR, f)
-    # 以只写模式打开我们的文本文件以写入替换的内容
-    with open(full_new_xml, 'w', encoding='UTF-8') as file:
-        # 在我们的文本文件中写入替换的数据
-        file.write(newXML)
-    chmod(full_new_xml, "755")
-    print("new xml:"+newXML)
-    d = xmltodict.parse(newXML)
-    spath = path.replace(baseName, "").replace("/Volumes/", "").replace("/", ":")
-    # # spath=
-    if ('HU' in d["ProductHints"]["Product"]["ProductSpecific"]):
-        hu = d["ProductHints"]["Product"]["ProductSpecific"]['HU']
-    else:
-        hu = ''
-    if ('JDX' in d["ProductHints"]["Product"]["ProductSpecific"]):
-        jdx = d["ProductHints"]["Product"]["ProductSpecific"]['JDX']
-    else:
-        jdx = ''
-
-    if ('UPID' in d["ProductHints"]["Product"]):
-        upid = d["ProductHints"]["Product"]['UPID']
-    else:
-        upid = ''
-
-    create_reg(rName, hu, upid, spath, jdx)
-    return full_new_xml
-
-
-def create_reg(libName, HU, UPID, path, JDX):
-    if len(libName) < 1:
-        return
-
-    front = path.split("::")[0]
-    back = path.split("::")[1]
-    p = front + ":\\" + back.replace(":", "\\")
-    # keyHandle = OpenKey(regRoot, subDir)
-    keyHandle = OpenKey(HKEY_LOCAL_MACHINE, subDir)
-    shellkey = CreateKey(keyHandle, str(libName))
-
-    subDir_2 = r'%s\%s' % (subDir, libName)
-    key = OpenKey(HKEY_LOCAL_MACHINE, subDir_2, 0, KEY_WRITE)
-    SetValueEx(key, "ContentDir", 0, REG_SZ, p)
-    SetValueEx(key, "ContentVersion", 0, REG_SZ, "1.0.0")
-    SetValueEx(key, "HU", 0, REG_SZ, HU)
-    SetValueEx(key, "JDX", 0, REG_SZ, JDX)
-    SetValueEx(key, "UPID", 0, REG_SZ, UPID)
-    SetValueEx(key, "Visibility", 0, REG_DWORD, 3)
-    CloseKey(key)
-    CloseKey(shellkey)
-    CloseKey(keyHandle)
-
-
-def deleteSubkey(key0, key1, key2=""):
-    if key2 == "":
-        currentkey = key1
-    else:
-        currentkey = key1 + "\\" + key2
-
-    open_key = OpenKey(key0, currentkey, 0, KEY_ALL_ACCESS)
-    infokey = QueryInfoKey(open_key)
-    for x in range(0, infokey[0]):
-        # NOTE:: This code is to delete the key and all subkeys.
-        #  If you just want to walk through them, then
-        #  you should pass x to EnumKey. subkey = EnumKey(open_key, x)
-        #  Deleting the subkey will change the SubKey count used by EnumKey.
-        #  We must always pass 0 to EnumKey so we
-        #  always get back the new first SubKey.
-        subkey = EnumKey(open_key, 0)
-        try:
-            DeleteKey(open_key, subkey)
-            print("Removed %s\\%s " % (currentkey, subkey))
-        except:
-            deleteSubkey(key0, currentkey, subkey)
-            # no extra delete here since each call
-            # to deleteSubkey will try to delete itself when its empty.
-
-    DeleteKey(open_key, "")
-    open_key.Close()
-    print("Removed %s" % (currentkey))
-    return
-
-
-def delete_reg(libName):
-    if len(libName) < 1:
-        return
-
-    Parentkey = OpenKey(HKEY_LOCAL_MACHINE, subDir, 0, KEY_ALL_ACCESS)
-
-    try:
-        deleteSubkey(Parentkey, libName, '')
-    except Exception as e:
-        print(e)
-
-    uParentkey = OpenKey(HKEY_CURRENT_USER, subDir, 0, KEY_ALL_ACCESS)
-    try:
-        deleteSubkey(uParentkey, libName, '')
-    except Exception as e:
-        print(e)
-
-    CloseKey(Parentkey)
-    CloseKey(uParentkey)
-
-
 def create_plist(libName, RegKey, HU, UPID, path, JDX, snpid):
     f = "com.native-instruments." + libName + ".plist"
     full_new_plist = os.path.join(TARGET_PLIST_DIR, f)
-    src = os.fspath(Path(__file__).resolve().parent / "src/Source.plist")
+    # src = get_path( "src/Source.plist")
+    url = os.path.dirname(os.path.abspath(__file__))
+    src = os.path.join(url, "src/Source.plist")
     plist = readPlist(src)
     plist['Name'] = libName
     plist['RegKey'] = RegKey
@@ -505,5 +291,5 @@ def create_plist(libName, RegKey, HU, UPID, path, JDX, snpid):
 
     writePlist(plist, full_new_plist)
     chmod(full_new_plist, "755")
-    # print("===dst plist:" + full_new_plist)
+    # #print("===dst plist:" + full_new_plist)
     return full_new_plist

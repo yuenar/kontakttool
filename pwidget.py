@@ -4,11 +4,12 @@
 import os
 import random
 from pathlib import Path
-from utiltool import create_nicnt
-from PySide6.QtWidgets import QPushButton, QWidget,QFileDialog,QLineEdit, QTextBrowser,QMessageBox
-from PySide6.QtGui import QRegularExpressionValidator,QImage,QPainter,QPixmap,QPen
-from PySide6.QtCore import QFile,QRegularExpression, Signal
-from PySide6.QtUiTools import QUiLoader
+from utiltool import *
+from PyQt5.QtWidgets import QPushButton, QWidget,QFileDialog,QLineEdit, QTextBrowser,QMessageBox
+from PyQt5.QtGui import QRegularExpressionValidator,QImage,QPainter,QPixmap,QPen
+from PyQt5.QtCore import QFile,QRegularExpression, pyqtSignal as Signal
+# from PyQt5.QtUiTools import QUiLoader
+from PyQt5 import uic
 
 class PWidget(QWidget):
     importPath = Signal(str)
@@ -41,12 +42,12 @@ class PWidget(QWidget):
         # hBtn.move(350,460)
         # hBtn.resize(330, 32)
 
-        self.ui.label_bf.setText(self.tr("Bank folder："))
-        self.ui.label_bn.setText(self.tr("BankName："))
-        self.ui.label_sid.setText(self.tr("Snpid："))
-        self.ui.label_wp.setText(self.tr("Wallpaper："))
-        self.ui.label_com.setText(self.tr("CompyName："))
-        self.ui.label_title.setText(self.tr("NICNT Generator"))
+        self.label_bf.setText(self.tr("Bank folder："))
+        self.label_bn.setText(self.tr("BankName："))
+        self.label_sid.setText(self.tr("Snpid："))
+        self.label_wp.setText(self.tr("Wallpaper："))
+        self.label_com.setText(self.tr("CompyName："))
+        self.label_title.setText(self.tr("NICNT Generator"))
 
         vtor=QRegularExpressionValidator()
         vtor.setRegularExpression(QRegularExpression("[^%&',;=?$\x22]+[a-zA-Z0-9]+$"))
@@ -92,11 +93,12 @@ class PWidget(QWidget):
         self.msgBox.setInformativeText(self.tr("Please check your input！"))
 
     def load_ui(self):
-        loader = QUiLoader()
-        path = os.fspath(Path(__file__).resolve().parent /"src/form.ui")
+        # loader = QUiLoader()
+        path = get_path("src/form.ui")
         ui_file = QFile(path)
         ui_file.open(QFile.ReadOnly)
-        self.ui = loader.load(ui_file, self)
+        uic.loadUi(ui_file,self)
+        # self.ui = loader.load(ui_file, self)
         ui_file.close()
 
     def openFolder(self):
@@ -104,7 +106,7 @@ class PWidget(QWidget):
         if len(lib_dir) < 1:
             return
 
-        # print(lib_dir)
+        # #print(lib_dir)
 
         self.ole.setText(lib_dir)
 
@@ -116,7 +118,7 @@ class PWidget(QWidget):
         else:
             if(os.path.exists(self.ole.text())):
                 baseName=os.path.basename(self.ole.text())
-                print("base"+baseName)
+                #print("base"+baseName)
                 if("-" in baseName):
                     comName=baseName.split("-",1)[0]
                     bName=baseName.split("-",1)[1]
@@ -167,18 +169,18 @@ class PWidget(QWidget):
             self.msgBox.setText(self.tr("Is not exist！"))
             self.msgBox.show()
         else:
-            # print("creating...")
+            # #print("creating...")
             path= create_nicnt(self.cle.text(),self.ble.text(),self.sle.text(),self.ole.text())
             self.importPath.emit(path)
             outPic = self.ole.text() + "/wallpaper.png"
 
             if not os.path.exists(self.ole.text()):
                 if len(self.ble.text()) < 10:
-                    src = os.fspath(Path(__file__).resolve().parent / "src/wallpaper1.png")
+                    src = get_path( "src/wallpaper1.png")
                 elif len(self.ble.text()) < 20:
-                    src = os.fspath(Path(__file__).resolve().parent / "src/wallpaper2.png")
+                    src = get_path( "src/wallpaper2.png")
                 else:
-                    src = os.fspath(Path(__file__).resolve().parent / "src/wallpaper.png")
+                    src = get_path( "src/wallpaper.png")
                 img=QImage(src)
                 pix= QPixmap(340,60)
                 p=QPainter(pix)

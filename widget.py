@@ -7,12 +7,13 @@ import platform
 import sys
 from pathlib import Path
 
-from PySide6.QtCore import QUrl,QTranslator
-from PySide6.QtGui import QDesktopServices, QPixmap
-from PySide6.QtWidgets import QMessageBox, QFileDialog
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QPushButton, \
+from PyQt5 import QtCore
+from PyQt5.QtGui import QDesktopServices, QPixmap
+from PyQt5.QtWidgets import QMessageBox, QFileDialog
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QPushButton, \
      QVBoxLayout, QListWidget, QApplication,QLabel
 
+import images
 from config import *
 from elevate import elevate
 from pwidget import PWidget
@@ -69,14 +70,14 @@ class Widget(QWidget):
 
             realname = item.text()
             if (realname in name):
-                print("del WENJIAN:" + name)
+                #print("del WENJIAN:" + name)
                 os.remove(name)
 
             if len(realname)<1:
                 baseName=os.path.basename(name)
                 realname=baseName.replace(".xml","")
 
-            print("del ReG:" + realname)
+            #print("del ReG:" + realname)
             delete_reg(realname)
             del self.list[row]
             # 删除widget
@@ -90,13 +91,13 @@ class Widget(QWidget):
             if os.path.exists(name):
                 os.remove(name)
                 baseName = os.path.basename(name).split(".")[0]
-                print("base"+baseName)
+                #print("base"+baseName)
                 for x in self.plistVector:
                     if baseName in x:
                         self.plistVector.remove(x)
                         if os.path.exists(x):
                             os.remove(x)
-                            print("del:"+x)
+                            #print("del:"+x)
 
             del self.list[row]
             item = self.listWidget.takeItem(row)
@@ -135,13 +136,13 @@ class Widget(QWidget):
 
 
                 if(realname in name):
-                    print("del WENJIAN:" + name)
+                    #print("del WENJIAN:" + name)
                     os.remove(name)
 
                 if len(realname) < 1:
                     baseName = os.path.basename(name)
                     realname = baseName.replace(".xml", "")
-                print("del ReG:" + realname)
+                #print("del ReG:" + realname)
                 delete_reg(realname)
 
                 # 删除widget
@@ -169,7 +170,7 @@ class Widget(QWidget):
         self.msgBox.resize(360,240)
         self.msgBox.setText(self.tr("Donate by alipay?"))
         self.msgBox.setInformativeText(self.tr("Development is not easy,\n thanks for the support!"))
-        src = os.fspath(Path(__file__).resolve().parent /"src/alipay.png")
+        src = get_path("src/alipay.png")
         p = QPixmap(src)
         self.msgBox.setIconPixmap(p.scaled(256, 256))
         palButton = self.msgBox.addButton(self.tr("Or Paypal？"), QMessageBox.ActionRole)
@@ -254,7 +255,7 @@ class Widget(QWidget):
                 subKeyName = EnumKey(keyHandle, i)
 
                 if "Kontakt Application" not in subKeyName:
-                    # print(subKeyName)
+                    # #print(subKeyName)
 
                     subDir_2 = r'%s\%s' % (subDir, subKeyName)
                     # 4.根据获取的键名拼接之前的路径作为参数，获取当前键下所属键的控制
@@ -325,18 +326,18 @@ class Widget(QWidget):
         if isWindows :
             for fullname in list:  # 循环读取每一行，1：是从第二行开始
                 if ".nicnt" in fullname:
-                    # print(line)
+                    # #print(line)
                     xml = parse_ncint_win(fullname)
-                    # print("parse:" + fullname+"==to=="+xml)
+                    # #print("parse:" + fullname+"==to=="+xml)
                     self.add2listView(xml)
                     continue
                     # break
         else:
             for fullname in list:  # mac
                 if ".nicnt" in fullname:
-                    # print(line)
+                    # #print(line)
                     xml, pls = parse_ncint_mac(fullname)
-                    # print("parse:" + fullname+"==to=="+xml)
+                    # #print("parse:" + fullname+"==to=="+xml)
                     self.add2listView(xml)
                     self.plistVector.append(pls)
                     continue
@@ -347,7 +348,7 @@ class Widget(QWidget):
             self.add2listView(xml)
         else:
             xml, pls = parse_ncint_mac(path)
-            # print("parse:" + fullname+"==to=="+xml)
+            # #print("parse:" + fullname+"==to=="+xml)
             self.add2listView(xml)
             self.plistVector.append(pls)
 
@@ -365,8 +366,8 @@ if __name__ == "__main__":
 
     curLang=locale.getdefaultlocale()[0]
 
-    # # # print(register.Encrypted(idcode))
-    # print(regcode)
+    # # # #print(register.Encrypted(idcode))
+    # #print(regcode)
     # register.regist(regcode)
 
 
@@ -375,10 +376,10 @@ if __name__ == "__main__":
 
 
     # if isWindows:
-    #     # print(platform.architecture())
+    #     # #print(platform.architecture())
     #     #
     #     # # #   计算机的网络名称，’acer-PC’
-    #     # print(platform.node())
+    #     # #print(platform.node())
     #
     #
     #     elevate(show_console=False)
@@ -390,111 +391,114 @@ if __name__ == "__main__":
     # else:
 	#     elevate()
     elevate()
-
-        # if os.geteuid() != 0:
-        # #     # print(platform.architecture())
-        # #
-        # #     # elevate(show_console=False)
-        # # # elevate(graphical=True)
-        #     # applescript.AppleScript('display dialog "程序需要完整磁盘权限，App need full disk access." giving up after 2').run()
-        #     # webbrowser.open('x-apple.systempreferences:com.apple.preference.security?Privacy')
-        #     # print("This program must be run as root.Or aborting.")
-        #     # cmd = os.fspath(Path(__file__).resolve().parent / "src/run.sh")
-        #     # os.system(cmd)
-        #     # os.system("open -a Terminal .")
-        #     applescript.AppleScript('display dialog "程序需要输入用户密码，App need input user password." giving up after 2').run()
-        #     applescript.AppleScript('''tell application "Terminal"
-        #                                     activate
-        #                                     set newTab to do script "sudo /Applications/kontakt-tool.app/Contents/MacOS/kontakt-tool"
-        #                                  end tell
-        #                             '''
-        #                             ).run()
-        #     sys.exit(-1)
+    # cmd = 'osascript do shell script "sudo /Applications/kontakt-tool.app/Contents/MacOS/kontakt-tool" with administrator privileges'
+    # os.system(cmd)
+    # exit(-1)
+    # if os.geteuid() != 0:
+    # # #     # #print(platform.architecture())
+    # # #
+    # # #     # elevate(show_console=False)
+    # # # # elevate(graphical=True)
+    # # applescript.AppleScript('display dialog "程序需要完整磁盘权限，App need full disk access." giving up after 2').run()
+    # #     # webbrowser.open('x-apple.systempreferences:com.apple.preference.security?Privacy')
+    # #     # #print("This program must be run as root.Or aborting.")
+    # #     # cmd = "sudo /Applications/kontakt-tool.app/Contents/MacOS/kontakt-tool"
+    # #     # os.system(cmd)
+    # #     # os.system("open -a Terminal .")
+    # #     # applescript.AppleScript('display dialog "程序需要输入用户密码，App need input user password." giving up after 2').run()
+    #     applescript.AppleScript('''tell application "Terminal"
+    #                                     activate
+    #                                     set newTab to do script "sudo /Applications/kontakt-tool.app/Contents/MacOS/kontakt-tool" with administrator privileges
+    #                                      end tell
+    #                                 '''
+    #                                 ).run()
+    #     sys.exit(-1)
 
     # #   计算机的网络名称，’acer-PC’
-    # print(platform.node())
+    # #print(platform.node())
     #
     # # 获取操作系统名称及版本号，’Windows-7-6.1.7601-SP1′
-    # print(platform.platform())
+    # #print(platform.platform())
     osType = str(platform.platform().split("-")[0])
     # 计算机处理器信息，’Intel64 Family 6 Model 42 Stepping 7, GenuineIntel’
     cpuType=platform.processor().split(" ")[0]
 
     # # 获取操作系统中Python的构建日期
-    # print(platform.python_build())
+    # #print(platform.python_build())
     #
     # #  获取系统中python解释器的信息
-    # print(platform.python_compiler())
+    # #print(platform.python_compiler())
 
     # register = RegisterClass()
-    # # # print(register.get_disk_info())
-    # # # print(register.get_network_info())
-    # # # print(register.get_mainboard_info())
-    # # # print("===================================================")
+    # # # #print(register.get_disk_info())
+    # # # #print(register.get_network_info())
+    # # # #print(register.get_mainboard_info())
+    # # # #print("===================================================")
     # #
-    # # # print(register.getCombinNumber())
-    # # # print("--------------------------------------------------")
+    # # # #print(register.getCombinNumber())
+    # # # #print("--------------------------------------------------")
     # idcode=register.getCombinNumber()
-    # # # print(idcode)
-    # # # print("===================================================")
+    # # # #print(idcode)
+    # # # #print("===================================================")
     # regcode = register.DesEncrypt(idcode)
     # register.regist(regcode)
 
     # register.checkAuthored()
 
-
-    if isWindows:
-        app = QApplication([])
-    else:
-        appGuid = 'kontakt'
-        app = QtSingleApplication(appGuid, sys.argv)
-        if app.isRunning():
-            # app.activationWindow()
-            sys.exit(0)
+    QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
+    app = QApplication(sys.argv)
+    # if isWindows:
+    #     app = QApplication([])
+    # else:
+    #     appGuid = 'kontakt'
+    #     app = QtSingleApplication(appGuid, sys.argv)
+    #     if app.isRunning():
+    #         # app.activationWindow()
+    #         sys.exit(0)
 
 
     # curLang="pt_ar"
 
     if "zh_" in curLang:
         if "CN" in curLang:
-            trs = os.fspath(Path(__file__).resolve().parent / "src/tr4zh_CN.qm")
+            trs = get_path( "src/tr4zh_CN.qm")
         else:
-            trs = os.fspath(Path(__file__).resolve().parent / "src/tr4zh_HK.qm")
+            trs = get_path( "src/tr4zh_HK.qm")
     elif "es_" in curLang:
-        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4es.qm")
+        trs = get_path( "src/tr4es.qm")
     elif "ja_" in curLang:
-        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4jp.qm")
+        trs = get_path( "src/tr4jp.qm")
     elif "ar_" in curLang:
-        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4ar.qm")
+        trs = get_path( "src/tr4ar.qm")
     elif "de_" in curLang:
-        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4de.qm")
+        trs = get_path( "src/tr4de.qm")
     elif "fr_" in curLang:
-        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4fr.qm")
+        trs = get_path( "src/tr4fr.qm")
     elif "ru_" in curLang:
-        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4ru.qm")
+        trs = get_path( "src/tr4ru.qm")
     elif "pt_" in curLang:
-        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4pt.qm")
+        trs = get_path( "src/tr4pt.qm")
     else:
-        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4en.qm")
+        trs = get_path( "src/tr4en.qm")
 
-        # trs = os.fspath(Path(__file__).resolve().parent / "src/tr4ar.qm")
+        # trs = get_path( "src/tr4ar.qm")
 
 
 
-    translator = QTranslator()
+    translator = QtCore.QTranslator()
     translator.load(trs)
     app.installTranslator(translator)
 
     app.setStyleSheet(StyleSheet)
     window = Widget()
     window.show()
-    window.move((1920-1080)*0.5,100)
+    window.move(int((1920-1080)*0.5),100)
     window.doDonate()
 
 
-    # print(register.get_disk_info())
-    # print(register.getCombinNumber())
-    # print(register.Encryted(register.getCombinNumber()))
+    # #print(register.get_disk_info())
+    # #print(register.getCombinNumber())
+    # #print(register.Encryted(register.getCombinNumber()))
 
     # window.test()
     # window.getFullLibs()

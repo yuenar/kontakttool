@@ -1,15 +1,15 @@
 # This Python file uses the following encoding: utf-8
 # -*- coding: utf-8 -*-
 
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtNetwork import *
-# from PySide6.QtWidgets import QApplication
-from PySide6.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtNetwork import *
+from PyQt5.QtWidgets import QApplication
+# from PyQt5.QtWidgets import *
 
 class QtSingleApplication(QApplication):
 
-    messageReceived = Signal(str)
+    messageReceived = pyqtSignal(str)
 
     def __init__(self, id, *argv):
 
