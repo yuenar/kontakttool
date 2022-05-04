@@ -8,6 +8,6 @@ macholib==1.16
 passlib==1.7.4
 Pillow==9.1.0
 pyDes==2.0.1
-pyqt5
+pyside6
 pyinstaller
 xmltodict

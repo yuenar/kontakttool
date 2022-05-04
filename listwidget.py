@@ -1,16 +1,17 @@
 # This Python file uses the following encoding: utf-8
 # -*- coding: utf-8 -*-
 
-from PyQt5.QtCore import QSize,pyqtSignal,QRect
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QPushButton, \
+from PySide6.QtCore import QSize,Signal,QRect
+# from PySide6.QtCore import QSize,pyqtSignal,QRect
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QPushButton, \
     QListWidgetItem,QLabel
-from PyQt5.QtGui import QPixmap, QImage,QPainter,QBrush,QPen,QColor
+from PySide6.QtGui import QPixmap, QImage,QPainter,QBrush,QPen,QColor
 
 from config import *
 from utiltool import *
 
 class ItemWidget(QWidget):
-    itemDeleted = pyqtSignal(QListWidgetItem)
+    itemDeleted = Signal(QListWidgetItem)
 
     def __init__(self, text, item, *args, **kwargs):
         super(ItemWidget, self).__init__(*args, **kwargs)

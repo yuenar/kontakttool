@@ -7,10 +7,10 @@ import platform
 import sys
 from pathlib import Path
 
-from PyQt5 import QtCore
-from PyQt5.QtGui import QDesktopServices, QPixmap
-from PyQt5.QtWidgets import QMessageBox, QFileDialog
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QPushButton, \
+from PySide6 import QtCore
+from PySide6.QtGui import QDesktopServices, QPixmap
+from PySide6.QtWidgets import QMessageBox, QFileDialog
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QPushButton, \
      QVBoxLayout, QListWidget, QApplication,QLabel
 
 import images
@@ -19,7 +19,6 @@ from elevate import elevate
 from pwidget import PWidget
 from listwidget import *
 from utiltool import *
-from QtSingleApplication import QtSingleApplication
 import applescript
 import locale
 
@@ -43,6 +42,8 @@ class Widget(QWidget):
         self.setMaximumSize(800,600)
 
         self.getFullLibs()
+
+
     #     # 鼠标移动
     # def mouseMoveEvent(self, event):
     #     if event.buttons() == Qt.LeftButton and self._mouse_pos:
@@ -61,43 +62,20 @@ class Widget(QWidget):
 
     def doDeleteItem(self, item):
         # 根据item得到它对应的行数
-        if isWindows:
-            row = self.listWidget.indexFromItem(item).row()
-            # 删除item
+        row = self.listWidget.indexFromItem(item).row()
+        # 删除item
 
-            name=self.list[row]
-            item = self.listWidget.takeItem(row)
-
-            realname = item.text()
-            if (realname in name):
-                #print("del WENJIAN:" + name)
-                os.remove(name)
-
-            if len(realname)<1:
-                baseName=os.path.basename(name)
-                realname=baseName.replace(".xml","")
-
-            #print("del ReG:" + realname)
-            delete_reg(realname)
-            del self.list[row]
-            # 删除widget
-            self.listWidget.removeItemWidget(item)
-            del item
-        else:
-            row = self.listWidget.indexFromItem(item).row()
-            # 删除item
-
-            name=self.list[row]
-            if os.path.exists(name):
-                os.remove(name)
-                baseName = os.path.basename(name).split(".")[0]
-                #print("base"+baseName)
-                for x in self.plistVector:
-                    if baseName in x:
-                        self.plistVector.remove(x)
-                        if os.path.exists(x):
-                            os.remove(x)
-                            #print("del:"+x)
+        name=self.list[row]
+        if os.path.exists(name):
+            os.remove(name)
+            baseName = os.path.basename(name).split(".")[0]
+            #print("base"+baseName)
+            for x in self.plistVector:
+                if baseName in x:
+                    self.plistVector.remove(x)
+                    if os.path.exists(x):
+                        os.remove(x)
+                        #print("del:"+x)
 
             del self.list[row]
             item = self.listWidget.takeItem(row)
@@ -124,36 +102,10 @@ class Widget(QWidget):
 
     def realClear(self):
         # 清空所有Item
-        if isWindows:
-            for _ in range(self.listWidget.count()):
-                # 删除item
-                # 一直是0的原因是一直从第一行删,删掉第一行后第二行变成了第一行
-                # 这个和删除list [] 里的数据是一个道理
-
-                item = self.listWidget.takeItem(0)
-                name = self.list[0]
-                realname = item.text()
-
-
-                if(realname in name):
-                    #print("del WENJIAN:" + name)
-                    os.remove(name)
-
-                if len(realname) < 1:
-                    baseName = os.path.basename(name)
-                    realname = baseName.replace(".xml", "")
-                #print("del ReG:" + realname)
-                delete_reg(realname)
-
-                # 删除widget
-                self.listWidget.removeItemWidget(item)
-                del item
-                del self.list[0]
-        else:
-            while self.listWidget.count() > 0:
-                item = self.listWidget.item(0)
-                self.doDeleteItem(item)
-            self.plistVector.clear()
+        while self.listWidget.count() > 0:
+            item = self.listWidget.item(0)
+            self.doDeleteItem(item)
+        self.plistVector.clear()
 
         self.listWidget.clear()
         self.list.clear()
@@ -246,44 +198,18 @@ class Widget(QWidget):
         if not os.path.exists(TARGET_XML_DIR):
             os.makedirs(TARGET_XML_DIR)
 
-        if isWindows:
+        if not os.path.exists(TARGET_PLIST_DIR):
+           os.makedirs(TARGET_PLIST_DIR)
 
-            keyHandle = OpenKey(HKEY_LOCAL_MACHINE, subDir)
-            count = QueryInfoKey(keyHandle)[0]  # 获取该目录下所有键的个数(0-下属键个数;1-当前键值个数)
-            for i in range(count):
-                # 3.穷举每个键，获取键名
-                subKeyName = EnumKey(keyHandle, i)
+        list=list_all_files(TARGET_XML_DIR,True)
+        for fullname in list:  # 循环读取每一行，1：是从第二行开始
+            if ".xml" in fullname:
+                self.add2listView(fullname)
 
-                if "Kontakt Application" not in subKeyName:
-                    # #print(subKeyName)
-
-                    subDir_2 = r'%s\%s' % (subDir, subKeyName)
-                    # 4.根据获取的键名拼接之前的路径作为参数，获取当前键下所属键的控制
-                    keyHandle_2 = OpenKey(regRoot, subDir_2)
-                    # count2 = QueryInfoKey(keyHandle_2)[1]
-                    # for j in range(count2):
-                    #     # 5.穷举每个键，获取键名、键值以及数据类型
-                    # name, value, type = EnumValue(keyHandle_2, 0)
-                    aname=TARGET_WIN_XML_DIR+"\\"+subKeyName+".xml"
-                    fullname=aname.replace("\\","/")
-                    self.add2listView(fullname)
-
-                    CloseKey(keyHandle_2)  # 读写操作结束后关闭键
-            CloseKey(keyHandle)
-
-        else:
-            if not os.path.exists(TARGET_PLIST_DIR):
-               os.makedirs(TARGET_PLIST_DIR)
-
-            list=list_all_files(TARGET_XML_DIR,True)
-            for fullname in list:  # 循环读取每一行，1：是从第二行开始
-                if ".xml" in fullname:
-                    self.add2listView(fullname)
-
-            plist=list_all_files(TARGET_PLIST_DIR,True)
-            for pullname in plist:  # 循环读取每一行，1：是从第二行开始
-                if "com.native-instruments." in pullname:
-                    self.plistVector.append(pullname)
+        plist=list_all_files(TARGET_PLIST_DIR,True)
+        for pullname in plist:  # 循环读取每一行，1：是从第二行开始
+            if "com.native-instruments." in pullname:
+                self.plistVector.append(pullname)
 
     def add2listView(self,fullname):
         n = judge_ktxml(fullname)
@@ -323,34 +249,21 @@ class Widget(QWidget):
             return
 
         list = list_all_files(lib_dir,is_iter)
-        if isWindows :
-            for fullname in list:  # 循环读取每一行，1：是从第二行开始
-                if ".nicnt" in fullname:
-                    # #print(line)
-                    xml = parse_ncint_win(fullname)
-                    # #print("parse:" + fullname+"==to=="+xml)
-                    self.add2listView(xml)
-                    continue
-                    # break
-        else:
-            for fullname in list:  # mac
-                if ".nicnt" in fullname:
-                    # #print(line)
-                    xml, pls = parse_ncint_mac(fullname)
-                    # #print("parse:" + fullname+"==to=="+xml)
-                    self.add2listView(xml)
-                    self.plistVector.append(pls)
-                    continue
+
+        for fullname in list:  # mac
+            if ".nicnt" in fullname:
+                # #print(line)
+                xml, pls = parse_ncint_mac(fullname)
+                # #print("parse:" + fullname+"==to=="+xml)
+                self.add2listView(xml)
+                self.plistVector.append(pls)
+                continue
 
     def import3rdLib(self,path):
-        if isWindows:
-            xml =parse_ncint_win(path)
-            self.add2listView(xml)
-        else:
-            xml, pls = parse_ncint_mac(path)
-            # #print("parse:" + fullname+"==to=="+xml)
-            self.add2listView(xml)
-            self.plistVector.append(pls)
+        xml, pls = parse_ncint_mac(path)
+        # #print("parse:" + fullname+"==to=="+xml)
+        self.add2listView(xml)
+        self.plistVector.append(pls)
 
 if __name__ == "__main__":
     #   获取操作系统可执行程序的结构，，(’32bit’, ‘WindowsPE’)
@@ -390,7 +303,7 @@ if __name__ == "__main__":
     #     # CloseKey(akey1Handle)
     # else:
 	#     elevate()
-    elevate()
+    elevate(show_console= False , graphical= True)
     # cmd = 'osascript do shell script "sudo /Applications/kontakt-tool.app/Contents/MacOS/kontakt-tool" with administrator privileges'
     # os.system(cmd)
     # exit(-1)

@@ -5,11 +5,13 @@ import os
 import random
 from pathlib import Path
 from utiltool import *
-from PyQt5.QtWidgets import QPushButton, QWidget,QFileDialog,QLineEdit, QTextBrowser,QMessageBox
-from PyQt5.QtGui import QRegularExpressionValidator,QImage,QPainter,QPixmap,QPen
-from PyQt5.QtCore import QFile,QRegularExpression, pyqtSignal as Signal
-# from PyQt5.QtUiTools import QUiLoader
-from PyQt5 import uic
+from PySide6.QtWidgets import QPushButton, QWidget,QFileDialog,QLineEdit, QTextBrowser,QMessageBox
+from PySide6.QtGui import QRegularExpressionValidator,QImage,QPainter,QPixmap,QPen
+# from PySide6.QtCore import QFile,QRegularExpression, pyqtSignal as Signal
+from PySide6.QtCore import QFile,QRegularExpression, Signal
+from PySide6.QtUiTools import QUiLoader
+# from PySide6 import  uic
+
 
 class PWidget(QWidget):
     importPath = Signal(str)
@@ -42,50 +44,50 @@ class PWidget(QWidget):
         # hBtn.move(350,460)
         # hBtn.resize(330, 32)
 
-        self.label_bf.setText(self.tr("Bank folder："))
-        self.label_bn.setText(self.tr("BankName："))
-        self.label_sid.setText(self.tr("Snpid："))
-        self.label_wp.setText(self.tr("Wallpaper："))
-        self.label_com.setText(self.tr("CompyName："))
-        self.label_title.setText(self.tr("NICNT Generator"))
+        self.ui.label_bf.setText(self.tr("Bank folder："))
+        self.ui.label_bn.setText(self.tr("BankName："))
+        self.ui.label_sid.setText(self.tr("Snpid："))
+        self.ui.label_wp.setText(self.tr("Wallpaper："))
+        self.ui.label_com.setText(self.tr("CompyName："))
+        self.ui.label_title.setText(self.tr("NICNT Generator"))
 
         vtor=QRegularExpressionValidator()
         vtor.setRegularExpression(QRegularExpression("[^%&',;=?$\x22]+[a-zA-Z0-9]+$"))
 
-        self.cle=QLineEdit(self)
-        self.cle.setPlaceholderText(self.tr("Cannot input Chinese！"))
-        self.cle.setMaxLength(128)
-        self.cle.move(20,60)
-        self.cle.resize(330,36)
-        self.cle.setValidator(vtor)
+        self.ui.cle=QLineEdit(self)
+        self.ui.cle.setPlaceholderText(self.tr("Cannot input Chinese！"))
+        self.ui.cle.setMaxLength(128)
+        self.ui.cle.move(20,60)
+        self.ui.cle.resize(330,36)
+        self.ui.cle.setValidator(vtor)
 
-        self.ble=QLineEdit(self)
-        self.ble.setPlaceholderText(self.tr("Cannot input Chinese！"))
-        self.ble.move(20, 150)
-        self.ble.setMaxLength(128)
-        self.ble.resize(330,36)
-        self.ble.setValidator(vtor)
+        self.ui.ble=QLineEdit(self)
+        self.ui.ble.setPlaceholderText(self.tr("Cannot input Chinese！"))
+        self.ui.ble.move(20, 150)
+        self.ui.ble.setMaxLength(128)
+        self.ui.ble.resize(330,36)
+        self.ui.ble.setValidator(vtor)
 
-        self.sle=QLineEdit(self)
-        self.sle.setPlaceholderText(self.tr("Cannot input Chinese！"))
-        self.sle.setText("a123")
+        self.ui.sle=QLineEdit(self)
+        self.ui.sle.setPlaceholderText(self.tr("Cannot input Chinese！"))
+        self.ui.sle.setText("a123")
 
         vtor1=QRegularExpressionValidator()
         vtor1.setRegularExpression(QRegularExpression("[a-zA-Z0-9]+$"))
-        self.sle.setValidator(vtor1)
-        self.sle.setMaxLength(4)
-        self.sle.move(20, 240)
-        self.sle.resize(330, 36)
+        self.ui.sle.setValidator(vtor1)
+        self.ui.sle.setMaxLength(4)
+        self.ui.sle.move(20, 240)
+        self.ui.sle.resize(330, 36)
 
-        self.ole=QLineEdit(self)
-        self.ole.setPlaceholderText(self.tr("choose a 3rd-bank floder."))
-        self.ole.move(20, 320)
-        self.ole.resize(330, 36)
+        self.ui.ole=QLineEdit(self)
+        self.ui.ole.setPlaceholderText(self.tr("choose a 3rd-bank floder."))
+        self.ui.ole.move(20, 320)
+        self.ui.ole.resize(330, 36)
 
-        self.wle = QLineEdit(self)
-        self.wle.setPlaceholderText(self.tr("choose a wallpaper."))
-        self.wle.move(20, 410)
-        self.wle.resize(330, 36)
+        self.ui.wle = QLineEdit(self)
+        self.ui.wle.setPlaceholderText(self.tr("choose a wallpaper."))
+        self.ui.wle.move(20, 410)
+        self.ui.wle.resize(330, 36)
 
         self.msgBox = QMessageBox()
         self.msgBox.setWindowTitle(self.tr('Warning'))
@@ -93,12 +95,12 @@ class PWidget(QWidget):
         self.msgBox.setInformativeText(self.tr("Please check your input！"))
 
     def load_ui(self):
-        # loader = QUiLoader()
+        loader = QUiLoader()
         path = get_path("src/form.ui")
         ui_file = QFile(path)
         ui_file.open(QFile.ReadOnly)
-        uic.loadUi(ui_file,self)
-        # self.ui = loader.load(ui_file, self)
+        # uic.loadUi(ui_file,self)
+        self.ui = loader.load(ui_file, self)
         ui_file.close()
 
     def openFolder(self):
