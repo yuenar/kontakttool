@@ -6,11 +6,13 @@ import re
 import os,sys
 from pathlib import Path
 
-isWindows= True
+isWindows= False
 cpuType = "Intel"
 osType = "Mac"
 bankCounts=0
 idcode="uni"
+curVersion="1.0.0"
+curLang="zh_CN"
 
 StyleSheet = """
 /*这里是通用设置，所有按钮都有效，不过后面的可以覆盖这个*/
@@ -51,7 +53,7 @@ QPushButton {
     border: none; /*去掉边框*/
     background-color: #CBD1D5;
     color:#FFFAFA;
-    font: bold 
+    font: bold italic 16px
 }
 /*
 QPushButton#xxx
@@ -124,6 +126,9 @@ subDir = r'SOFTWARE\Native Instruments'
 TARGET_MAC_XML_DIR = "/Library/Application Support/Native Instruments/Service Center"
 TARGET_WIN_XML_DIR = "C:\\Program Files\\Common Files\\Native Instruments\\Service Center"
 TARGET_PLIST_PATH = "/Library/Preferences/com.native-instruments."
+
+TARGET_MAC_ICON_DIR = "/Library/Application Support/Native Instruments/owenzhang/PAResources/image/owenzhang"
+TARGET_MAC_LIST = "/Library/Application Support/Native Instruments/kontakt.ls"
 # TARGET_PLIST_DIR = "/Volumes/misc/test/Preferences"
 # TARGET_XML_DIR = "/Volumes/misc/test/Service Center"
 

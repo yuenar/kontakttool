@@ -7,7 +7,7 @@ import platform
 import sys
 from pathlib import Path
 
-from PySide6.QtCore import QUrl
+from PySide6.QtCore import QUrl,QTranslator,QLocale
 from PySide6.QtGui import QDesktopServices, QPixmap
 from PySide6.QtWidgets import QMessageBox, QFileDialog
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QPushButton, \
@@ -20,11 +20,12 @@ from listwidget import *
 from utiltool import *
 from QtSingleApplication import QtSingleApplication
 import applescript
+# import locale
 
 class Widget(QWidget):
     def __init__(self):
         QWidget.__init__(self)
-        self.setWindowTitle("音色库管理工具Kontakt Tool by OwenZhang张礼乐  {} - {}".format(osType,cpuType))
+        self.setWindowTitle(self.tr("Kontakt Tool by OwenZhang  {} - {}").format(osType,cpuType))
         self.dialog = QFileDialog()
         self.list=[]
         self.plistVector=[]
@@ -106,7 +107,7 @@ class Widget(QWidget):
         self.updateTile()
 
     def updateTile(self):
-        self.titleLine.setText('  Loaded banks已加载:  {}  套音色'.format(self.listWidget.count()))
+        self.titleLine.setText(self.tr("  Loaded banks:  {}").format(str(self.listWidget.count())))
 
     def doClearItem(self):
         if(self.listWidget.count()<1):
@@ -114,10 +115,10 @@ class Widget(QWidget):
 
         msgBox = QMessageBox(self)
         msgBox.resize(360,240)
-        msgBox.setWindowTitle('警告Warning')
+        msgBox.setWindowTitle(self.tr('Warning'))
         msgBox.setIcon(QMessageBox.Warning)
-        msgBox.setText("是否清空所有入库音色？操作不可还原！\n Clear all banked tones? The operation is irreversible!")
-        okButton = msgBox.addButton(self.tr("确定\nGo on"), QMessageBox.ActionRole)
+        msgBox.setText(self.tr("Clear all banked tones? The operation is irreversible!"))
+        okButton = msgBox.addButton(self.tr("Go on"), QMessageBox.ActionRole)
         okButton.clicked.connect(self.realClear)
         msgBox.exec()
 
@@ -159,7 +160,7 @@ class Widget(QWidget):
         self.updateTile()
     def doVisit(self):
         # QDesktopServices.openUrl(QUrl("mailto:yuenar2@gmail.com"))
-        QDesktopServices.openUrl(QUrl("https://tools.pro-music.cn/"))
+        QDesktopServices.openUrl(QUrl("https://yuenar.github.io/kontakt-tool.github.io"))
 
     def doHelper(self):
         self.sw.setCurrentIndex(2)
@@ -167,12 +168,12 @@ class Widget(QWidget):
     def doDonate(self):
         msgBox = QMessageBox(self)
         msgBox.resize(360,240)
-        msgBox.setWindowTitle("支付宝向我捐赠？\n Donate by alipay?")
-        msgBox.setInformativeText(" 开发不易，感谢支持!\n Development is not easy,\n thanks for the support!")
+        msgBox.setText(self.tr("Donate by alipay?"))
+        msgBox.setInformativeText(self.tr("Development is not easy,\n thanks for the support!"))
         src = os.fspath(Path(__file__).resolve().parent /"src/alipay.png")
         p = QPixmap(src)
         msgBox.setIconPixmap(p.scaled(256, 256))
-        palButton = msgBox.addButton(self.tr("Or Paypal\n或贝宝？"), QMessageBox.ActionRole)
+        palButton = msgBox.addButton(self.tr("Or Paypal？"), QMessageBox.ActionRole)
         palButton.clicked.connect(self.paypal)
         msgBox.exec()
 
@@ -205,6 +206,12 @@ class Widget(QWidget):
         # //https://y.qq.com/n/ryqq/singer/0044yxPF1Zultc
         firstPageWidget = PWidget()
         firstPageWidget.importPath.connect(self.import3rdLib)
+
+        if "ar" in curLang:
+            firstPageWidget.setAr(True)
+        else:
+            firstPageWidget.setAr(False)
+
         layout.addWidget(firstPageWidget)
 
         mainLay.addLayout(vLay)
@@ -212,19 +219,19 @@ class Widget(QWidget):
 
         hVl = QHBoxLayout(self)
         # 清空按钮
-        self.clearBtn = QPushButton('清空音色 Clear banks', self, objectName="OrangeButton", minimumHeight=48 ,clicked=self.doClearItem)
+        self.clearBtn = QPushButton(self.tr('Clear banks'), self, objectName="OrangeButton", minimumHeight=48 ,clicked=self.doClearItem)
         hVl.addWidget(self.clearBtn)
 
-        fBtn=QPushButton("导入音色Load banks", self,
-                                     objectName="OrangeButton", minimumHeight=48 ,clicked=self.open_ni_dir)
+        fBtn=QPushButton(self.tr("Load bank"), self,
+                                     objectName="OrangeButton", minimumHeight=48 ,clicked=self.doLoadBank)
 
-        tBtn=QPushButton("捐赠Donate", self,
+        tBtn=QPushButton(self.tr("Load banks"), self,
+                                     objectName="OrangeButton", minimumHeight=48 ,clicked=self.doLoadMultiBank)
+
+        oBtn=QPushButton(self.tr("Donate"), self,
                                      objectName="OrangeButton", minimumHeight=48 ,clicked=self.doDonate)
 
-        oBtn=QPushButton("关注作者Follow me", self,
-                                     objectName="OrangeButton", minimumHeight=48 ,clicked=self.doFollow)
-
-        eBtn=QPushButton("访问官网HomePage", self,
+        eBtn=QPushButton(self.tr("HomePage"), self,
                                      objectName="OrangeButton", minimumHeight=48 ,clicked=self.doVisit)
 
         hVl.addWidget(fBtn)
@@ -267,12 +274,12 @@ class Widget(QWidget):
             if not os.path.exists(TARGET_PLIST_DIR):
                os.makedirs(TARGET_PLIST_DIR)
 
-            list=list_all_files(TARGET_XML_DIR)
+            list=list_all_files(TARGET_XML_DIR,True)
             for fullname in list:  # 循环读取每一行，1：是从第二行开始
                 if ".xml" in fullname:
                     self.add2listView(fullname)
 
-            plist=list_all_files(TARGET_PLIST_DIR)
+            plist=list_all_files(TARGET_PLIST_DIR,True)
             for pullname in plist:  # 循环读取每一行，1：是从第二行开始
                 if "com.native-instruments." in pullname:
                     self.plistVector.append(pullname)
@@ -286,29 +293,35 @@ class Widget(QWidget):
             return
 
         item = QListWidgetItem(self.listWidget)
-        item.setSizeHint(QSize(380, 42))
+        item.setSizeHint(QSize(380, 62))
         # widget = ItemWidget('已导入Exist:    {}'.format(n), item, self.listWidget)
         widget = ItemWidget('{}'.format(n), item, self.listWidget)
-        widget.setFixedSize(QSize(380, 42))
+        widget.setFixedSize(QSize(380, 62))
         # 绑定删除信号
         widget.itemDeleted.connect(self.doDeleteItem)
         self.listWidget.setItemWidget(item, widget)
         self.list.append(fullname)
         self.updateTile()
 
-    def open_ni_dir(self):
+    def doLoadBank(self):
+        self.open_ni_dir(False)
+
+    def doLoadMultiBank(self):
+        self.open_ni_dir(True)
+
+    def open_ni_dir(self,is_iter):
         if not os.path.exists(TARGET_PLIST_DIR):
            os.makedirs(TARGET_PLIST_DIR)
 
         if not os.path.exists(TARGET_XML_DIR):
            os.makedirs(TARGET_XML_DIR)
 
-        lib_dir = self.dialog.getExistingDirectory(self, "选取文件夹", os.getcwd())
+        lib_dir = self.dialog.getExistingDirectory(self, self.tr("Broswer"), os.getcwd())
 
         if len(lib_dir)<1:
             return
 
-        list = list_all_files(lib_dir)
+        list = list_all_files(lib_dir,is_iter)
         if isWindows :
             for fullname in list:  # 循环读取每一行，1：是从第二行开始
                 if ".nicnt" in fullname:
@@ -342,6 +355,8 @@ if __name__ == "__main__":
     #   获取操作系统可执行程序的结构，，(’32bit’, ‘WindowsPE’)
     global isWindows
     global idcode
+    global curLang
+
     if "Windows" in str(platform.architecture()):
 
         isWindows= True
@@ -361,21 +376,22 @@ if __name__ == "__main__":
 
 
 
-    if isWindows:
-        # print(platform.architecture())
-        #
-        # # #   计算机的网络名称，’acer-PC’
-        # print(platform.node())
-
-
-        elevate(show_console=False)
-
-        akeyHandle = CreateKey(HKEY_LOCAL_MACHINE, subDir)
-        akey1Handle = CreateKey(HKEY_CURRENT_USER, subDir)
-        CloseKey(akeyHandle)
-        CloseKey(akey1Handle)
-    else:
-	    elevate()
+    # if isWindows:
+    #     # print(platform.architecture())
+    #     #
+    #     # # #   计算机的网络名称，’acer-PC’
+    #     # print(platform.node())
+    #
+    #
+    #     elevate(show_console=False)
+    #
+    #     # akeyHandle = CreateKey(HKEY_LOCAL_MACHINE, subDir)
+    #     # akey1Handle = CreateKey(HKEY_CURRENT_USER, subDir)
+    #     # CloseKey(akeyHandle)
+    #     # CloseKey(akey1Handle)
+    # else:
+	#     elevate()
+    elevate()
 
         # if os.geteuid() != 0:
         # #     # print(platform.architecture())
@@ -412,43 +428,62 @@ if __name__ == "__main__":
     # #  获取系统中python解释器的信息
     # print(platform.python_compiler())
 
-    register = RegisterClass()
-    # # print(register.get_disk_info())
-    # # print(register.get_network_info())
-    # # print(register.get_mainboard_info())
-    # # print("===================================================")
-    #
-    # # print(register.getCombinNumber())
-    # # print("--------------------------------------------------")
-    idcode=register.getCombinNumber()
-    # # print(idcode)
-    # # print("===================================================")
-    regcode = register.DesEncrypt(idcode)
-    register.regist(regcode)
+    # register = RegisterClass()
+    # # # print(register.get_disk_info())
+    # # # print(register.get_network_info())
+    # # # print(register.get_mainboard_info())
+    # # # print("===================================================")
+    # #
+    # # # print(register.getCombinNumber())
+    # # # print("--------------------------------------------------")
+    # idcode=register.getCombinNumber()
+    # # # print(idcode)
+    # # # print("===================================================")
+    # regcode = register.DesEncrypt(idcode)
+    # register.regist(regcode)
 
     # register.checkAuthored()
 
     if isWindows:
         app = QApplication([])
     else:
-        appGuid = 'kontakt'+register.getCombinNumber()
+        appGuid = 'kontakt'
         app = QtSingleApplication(appGuid, sys.argv)
         if app.isRunning():
             # app.activationWindow()
             sys.exit(0)
 
-
-
-
-
-    window = QWidget()
-    screen = QApplication.primaryScreen()
+    curLang=QLocale.system().uiLanguages()[0]
+    print("------------"+curLang)
+    if "zh" in curLang:
+        if "CN" in curLang:
+            trs = os.fspath(Path(__file__).resolve().parent /  "src/tr4zh_CN.qm")
+        else:
+            trs = os.fspath(Path(__file__).resolve().parent /  "src/tr4zh_HK.qm")
+    elif "es" in curLang:
+        trs = os.fspath(Path(__file__).resolve().parent /  "src/tr4es.qm")
+    elif "ja" in curLang:
+        trs = os.fspath(Path(__file__).resolve().parent /  "src/tr4jp.qm")
+    elif "ar" in curLang:
+        trs = os.fspath(Path(__file__).resolve().parent /  "src/tr4ar.qm")
+    elif "de" in curLang:
+        trs = os.fspath(Path(__file__).resolve().parent /  "src/tr4de.qm")
+    elif "fr" in curLang:
+        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4fr.qm")
+    elif "ru" in curLang:
+        trs = os.fspath(Path(__file__).resolve().parent /  "src/tr4ru.qm")
+    elif "pt" in curLang:
+        trs = os.fspath(Path(__file__).resolve().parent /  "src/tr4pt.qm")
+    else:
+        trs = os.fspath(Path(__file__).resolve().parent /  "src/tr4en.qm")
+    translator = QTranslator()
+    translator.load(trs)
+    app.installTranslator(translator)
 
     app.setStyleSheet(StyleSheet)
     window = Widget()
     window.show()
-    window.move((1920-1080)*0.5,100)
-
+    window.move(420,100)
     window.doDonate()
 
 
