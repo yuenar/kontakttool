@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
 import random
 from pathlib import Path
-from utiltool import create_nicnt
+from utiltool import *
 from PySide6.QtWidgets import QPushButton, QWidget,QFileDialog,QLineEdit, QTextBrowser,QMessageBox
 from PySide6.QtGui import QRegularExpressionValidator,QImage,QPainter,QPixmap,QPen
 from PySide6.QtCore import QFile,QRegularExpression, Signal
@@ -93,9 +94,9 @@ class PWidget(QWidget):
 
     def load_ui(self):
         loader = QUiLoader()
-        path = os.fspath(Path(__file__).resolve().parent /"src/form.ui")
+        path = get_path( "src/form.ui")
         ui_file = QFile(path)
-        ui_file.open(QFile.ReadOnly)
+        ui_file.open(QFile.Truncate and QFile.ReadOnly)
         self.ui = loader.load(ui_file, self)
         ui_file.close()
 
@@ -174,11 +175,11 @@ class PWidget(QWidget):
 
             if not os.path.exists(self.ole.text()):
                 if len(self.ble.text()) < 10:
-                    src = os.fspath(Path(__file__).resolve().parent / "src/wallpaper1.png")
+                    src = get_path( "src/wallpaper1.png")
                 elif len(self.ble.text()) < 20:
-                    src = os.fspath(Path(__file__).resolve().parent / "src/wallpaper2.png")
+                    src = get_path(  "src/wallpaper2.png")
                 else:
-                    src = os.fspath(Path(__file__).resolve().parent / "src/wallpaper.png")
+                    src = get_path(  "src/wallpaper.png")
                 img=QImage(src)
                 pix= QPixmap(340,60)
                 p=QPainter(pix)

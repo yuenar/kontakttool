@@ -6,19 +6,19 @@ import platform
 
 import sys
 from pathlib import Path
-
-from PySide6.QtCore import QUrl,QTranslator
+from PySide6 import QtCore
+from PySide6.QtCore import QUrl,QTranslator,QCoreApplication
 from PySide6.QtGui import QDesktopServices, QPixmap
 from PySide6.QtWidgets import QMessageBox, QFileDialog
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QPushButton, \
      QVBoxLayout, QListWidget, QApplication,QLabel
-
+import sh
 from config import *
 from elevate import elevate
 from pwidget import PWidget
 from listwidget import *
 from utiltool import *
-from QtSingleApplication import QtSingleApplication
+# from QtSingleApplication import QtSingleApplication
 import applescript
 import locale
 
@@ -159,7 +159,7 @@ class Widget(QWidget):
         self.updateTile()
     def doVisit(self):
         # QDesktopServices.openUrl(QUrl("mailto:yuenar2@gmail.com"))
-        QDesktopServices.openUrl(QUrl("https://tools.pro-music.cn/"))
+        QDesktopServices.openUrl(QUrl("https://yuenar.github.io/kontakt-tool.github.io"))
 
     def doHelper(self):
         self.sw.setCurrentIndex(2)
@@ -169,7 +169,7 @@ class Widget(QWidget):
         self.msgBox.resize(360,240)
         self.msgBox.setText(self.tr("Donate by alipay?"))
         self.msgBox.setInformativeText(self.tr("Development is not easy,\n thanks for the support!"))
-        src = os.fspath(Path(__file__).resolve().parent /"src/alipay.png")
+        src = get_path("src/alipay.png")
         p = QPixmap(src)
         self.msgBox.setIconPixmap(p.scaled(256, 256))
         palButton = self.msgBox.addButton(self.tr("Or Paypal？"), QMessageBox.ActionRole)
@@ -365,6 +365,8 @@ if __name__ == "__main__":
 
     curLang=locale.getdefaultlocale()[0]
 
+    # root = tk.Tk()
+    # root.
     # # # print(register.Encrypted(idcode))
     # print(regcode)
     # register.regist(regcode)
@@ -389,7 +391,7 @@ if __name__ == "__main__":
     #     # CloseKey(akey1Handle)
     # else:
 	#     elevate()
-    elevate()
+    # elevate()
 
         # if os.geteuid() != 0:
         # #     # print(platform.architecture())
@@ -399,17 +401,28 @@ if __name__ == "__main__":
         #     # applescript.AppleScript('display dialog "程序需要完整磁盘权限，App need full disk access." giving up after 2').run()
         #     # webbrowser.open('x-apple.systempreferences:com.apple.preference.security?Privacy')
         #     # print("This program must be run as root.Or aborting.")
-        #     # cmd = os.fspath(Path(__file__).resolve().parent / "src/run.sh")
+        #     # cmd = LoadFile( "src/run.sh")
         #     # os.system(cmd)
         #     # os.system("open -a Terminal .")
         #     applescript.AppleScript('display dialog "程序需要输入用户密码，App need input user password." giving up after 2').run()
-        #     applescript.AppleScript('''tell application "Terminal"
-        #                                     activate
-        #                                     set newTab to do script "sudo /Applications/kontakt-tool.app/Contents/MacOS/kontakt-tool"
-        #                                  end tell
-        #                             '''
-        #                             ).run()
-        #     sys.exit(-1)
+    if os.geteuid() != 0:
+        cmd =get_filename("src/run.sh")
+        elevate()
+        os.system(cmd)
+        # elevate()
+        # # os.system('do shell script "sudo /Applications/kontakt-tool.app/Contents/MacOS/kontakt-tool" with administrator privileges')
+        # applescript.AppleScript('''tell application "Terminal"
+        #                                 activate
+        #                                 set newTab to do shell script "sudo /Applications/kontakt-tool.app/Contents/MacOS/kontakt-tool" with administrator privileges
+        #                              end tell
+        #                         '''
+        #                         ).run()
+        # applescript.AppleScript.call("Terminal",'''
+        #                              activatedo scr
+        #                                 set newTab to ipt "sudo /Applications/kontakt-tool.app/Contents/MacOS/kontakt-tool" with administrator privileges
+        #                         '''
+        #                         )
+        sys.exit(-1)
 
     # #   计算机的网络名称，’acer-PC’
     # print(platform.node())
@@ -443,41 +456,43 @@ if __name__ == "__main__":
     # register.checkAuthored()
 
 
-    if isWindows:
-        app = QApplication([])
-    else:
-        appGuid = 'kontakt'
-        app = QtSingleApplication(appGuid, sys.argv)
-        if app.isRunning():
-            # app.activationWindow()
-            sys.exit(0)
+    # if isWindows:
+    #     app = QApplication([])
+    # else:
+    #     appGuid = 'kontakt'
+    #     app = QtSingleApplication(appGuid, sys.argv)
+    #     if app.isRunning():
+    #         # app.activationWindow()
+    #         applescript.AppleScript('display dialog "程序需要完整磁盘权限，App need full disk access." giving up after 2').run()
+    #         sys.exit(0)
 
-
+    QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
+    app = QApplication([])
     # curLang="pt_ar"
 
     if "zh_" in curLang:
         if "CN" in curLang:
-            trs = os.fspath(Path(__file__).resolve().parent / "src/tr4zh_CN.qm")
+            trs = get_path( "src/tr4zh_CN.qm")
         else:
-            trs = os.fspath(Path(__file__).resolve().parent / "src/tr4zh_HK.qm")
+            trs = get_path( "src/tr4zh_HK.qm")
     elif "es_" in curLang:
-        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4es.qm")
+        trs = get_path( "src/tr4es.qm")
     elif "ja_" in curLang:
-        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4jp.qm")
+        trs = get_path( "src/tr4jp.qm")
     elif "ar_" in curLang:
-        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4ar.qm")
+        trs = get_path( "src/tr4ar.qm")
     elif "de_" in curLang:
-        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4de.qm")
+        trs = get_path( "src/tr4de.qm")
     elif "fr_" in curLang:
-        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4fr.qm")
+        trs = get_path( "src/tr4fr.qm")
     elif "ru_" in curLang:
-        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4ru.qm")
+        trs = get_path( "src/tr4ru.qm")
     elif "pt_" in curLang:
-        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4pt.qm")
+        trs = get_path( "src/tr4pt.qm")
     else:
-        trs = os.fspath(Path(__file__).resolve().parent / "src/tr4en.qm")
+        trs = get_path( "src/tr4en.qm")
 
-        # trs = os.fspath(Path(__file__).resolve().parent / "src/tr4ar.qm")
+        # trs = LoadFile( "src/tr4ar.qm")
 
 
 
@@ -488,7 +503,7 @@ if __name__ == "__main__":
     app.setStyleSheet(StyleSheet)
     window = Widget()
     window.show()
-    window.move((1920-1080)*0.5,100)
+    window.move(420,100)
     window.doDonate()
 
 
@@ -500,6 +515,6 @@ if __name__ == "__main__":
     # window.getFullLibs()
     # window.open_ni_dir()
     sys.exit(app.exec())
-
+    # root = tk.Tk()
 
 

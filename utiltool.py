@@ -23,11 +23,40 @@ import uuid
 import base64
 import zlib
 from passlib.hash import sha256_crypt
+# from Foundation import NSFileManager, NSString, NSData, NSUTF8StringEncoding
+# from AppKit import NSBundle
 
-
-import base64
+import base64,platform
 import pyDes
+import images
 
+def get_path(p):
+    s=p.replace("src","images")
+    path=":/"+s
+    #print("======"+path)
+    return path
+
+def LoadFile(p_file):
+    p_file_split=str(p_file).split('.')
+    p_name=p_file_split[0]
+    p_ext=p_file_split[1]
+    if platform.system() == 'Windows':
+        return os.path.join(os.path.dirname(sys.argv[0]), p_file)
+
+    elif platform.system() == 'Darwin':
+        # s=p_file.replace("src","../../ReSources/src")
+        return os.path.join(os.path.dirname(os.path.abspath(__file__)), p_file)
+        # return NSBundle.mainBundle().pathForResource_ofType_(p_name, p_ext)
+
+def get_filename(filename):
+    name = os.path.splitext(filename)[0]
+    ext = os.path.splitext(filename)[1]
+    # if platform.system() == "Darwin":
+    #     from AppKit import NSBundle
+    #     file = NSBundle.mainBundle().pathForResource_ofType_(name, ext)
+    #     return file or os.path.realpath(filename)
+    # else:
+    return os.path.realpath(filename)
 
 class RegisterClass:
     def __init__(self):
@@ -271,7 +300,7 @@ def judge_plist(apath):
     for fullname in list:  # mac
         if apath in fullname:
             # print(line)
-            plist= readPlist(fullname)
+            plist= readPlist(get_filename(fullname))
             picPath="/Volumes/"+plist['ContentDir'].replace(":","/")+"wallpaper.png"
             break
 
@@ -280,7 +309,7 @@ def judge_plist(apath):
 
 def create_nicnt(compyName,libName,snpid,path):
     if os.path.isdir(path):
-        src = os.fspath(Path(__file__).resolve().parent /"src/Source.nicnt")
+        src = LoadFile("src/Source.nicnt")
         fullname=libName+".nicnt"
         fullpath=os.path.join(path,fullname)
 
@@ -321,10 +350,13 @@ def list_dir_files(rootdir):
 def parse_ncint_mac(path):
     # f = open(path, "r", encoding='unicode_escape')
     f = open(path, "r", encoding="ISO-8859-1")
-    baseName = os.path.basename(path)
+    baseName = os.path.basename(get_filename(path))
     libName = baseName.replace(".nicnt", ".")
 
     lines = f.readlines()  # 读取全部内容 ，并以列表方式返回
+    if(len(lines)<5):
+        return "",""
+
     newXML = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n'
 
     for line in lines[1:]:  # 循环读取每一行，1：是从第二行开始
@@ -493,8 +525,8 @@ def delete_reg(libName):
 def create_plist(libName, RegKey, HU, UPID, path, JDX, snpid):
     f = "com.native-instruments." + libName + ".plist"
     full_new_plist = os.path.join(TARGET_PLIST_DIR, f)
-    src = os.fspath(Path(__file__).resolve().parent / "src/Source.plist")
-    plist = readPlist(src)
+    src = LoadFile( "src/Source.plist")
+    plist = readPlist(get_filename(src))
     plist['Name'] = libName
     plist['RegKey'] = RegKey
     plist['SNPID'] = snpid

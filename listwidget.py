@@ -6,6 +6,7 @@ from PySide6.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QPushButton, \
     QListWidgetItem,QLabel
 from PySide6.QtGui import QPixmap, QImage,QPainter,QBrush,QPen
 
+import  images
 from config import *
 from utiltool import *
 
@@ -35,11 +36,11 @@ class ItemWidget(QWidget):
                     lab = QLabel(self)
                     lab.setFixedSize(QSize(340, 60))
                     if len(text) < 10:
-                        src = os.fspath(Path(__file__).resolve().parent / "src/wallpaper1.png")
+                        src = get_path( "src/wallpaper1.png")
                     elif len(text) < 20:
-                        src = os.fspath(Path(__file__).resolve().parent / "src/wallpaper2.png")
+                        src = get_path( "src/wallpaper2.png")
                     else:
-                        src = os.fspath(Path(__file__).resolve().parent / "src/wallpaper.png")
+                        src = get_path( "src/wallpaper.png")
                     img = QImage(src)
                     apix = QPixmap(340, 60)
                     p = QPainter(apix)
