@@ -1,0 +1,20 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+<qresource>
+<file alias="images/alipay.png">images/alipay.png</file>
+<file alias="images/form.ui">images/form.ui</file>
+<file alias="images/tr4ar.qm">images/tr4ar.qm</file>
+<file alias="images/tr4de.qm">images/tr4de.qm</file>
+<file alias="images/tr4en.qm">images/tr4en.qm</file>
+<file alias="images/tr4es.qm">images/tr4es.qm</file>
+<file alias="images/tr4fr.qm">images/tr4fr.qm</file>
+<file alias="images/tr4jp.qm">images/tr4jp.qm</file>
+<file alias="images/tr4pt.qm">images/tr4pt.qm</file>
+<file alias="images/tr4ru.qm">images/tr4ru.qm</file>
+<file alias="images/tr4zh_CN.qm">images/tr4zh_CN.qm</file>
+<file alias="images/tr4zh_HK.qm">images/tr4zh_HK.qm</file>
+<file alias="images/wallpaper.png">images/wallpaper.png</file>
+<file alias="images/wallpaper1.png">images/wallpaper1.png</file>
+<file alias="images/wallpaper2.png">images/wallpaper2.png</file>
+</qresource>
+</RCC>

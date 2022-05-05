@@ -1,17 +1,18 @@
 # This Python file uses the following encoding: utf-8
 # -*- coding: utf-8 -*-
 
-from PySide6.QtCore import QSize, Signal as pyqtSignal,QRect
+from PySide6.QtCore import QSize,Signal,QRect
+# from PySide6.QtCore import QSize,pyqtSignal,QRect
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QPushButton, \
     QListWidgetItem,QLabel
-from PySide6.QtGui import QPixmap, QImage,QPainter,QBrush,QPen
+from PySide6.QtGui import QPixmap, QImage,QPainter,QBrush,QPen,QColor
 
 import  images
 from config import *
 from utiltool import *
 
 class ItemWidget(QWidget):
-    itemDeleted = pyqtSignal(QListWidgetItem)
+    itemDeleted = Signal(QListWidgetItem)
 
     def __init__(self, text, item, *args, **kwargs):
         super(ItemWidget, self).__init__(*args, **kwargs)
@@ -44,7 +45,7 @@ class ItemWidget(QWidget):
                     img = QImage(src)
                     apix = QPixmap(340, 60)
                     p = QPainter(apix)
-                    p.setPen("#34495E")
+                    p.setPen(QColor("#34495E"))
                     p.drawImage(apix.rect(), img.scaled(340, 60))
                     p.drawText(35, 50, text)
                     p.end()
@@ -53,23 +54,23 @@ class ItemWidget(QWidget):
                     layout.addWidget(lab)
 
                 else:
-                    # print("jpg path:" + pic)
+                    # #print("jpg path:" + pic)
                     lab = QLabel(self)
                     lab.setFixedSize(QSize(340, 60))
                     img = QImage(pic)
                     rect = QRect(0,0,340, 60)
                     pi = QPixmap(510, 60)
                     pt = QPainter(pi)
-                    pt.setPen("#34495E")
+                    pt.setPen(QColor("#34495E"))
                     pt.setRenderHint(QPainter.Antialiasing)
-                    pt.fillRect(QRect(0, 0, 510, 60), QBrush("#CBD1D5"))
+                    pt.fillRect(QRect(0, 0, 510, 60), QBrush(QColor("#CBD1D5")))
                     pt.drawImage(rect, img.scaled(340,60))
                     pt.drawText(35, 50, text)
                     pt.end()
                     lab.setPixmap(pi)
                     layout.addWidget(lab)
             else:
-                # print("png path:" + ps)
+                # #print("png path:" + ps)
                 pic=ps
                 lab = QLabel(self)
                 lab.setFixedSize(QSize(340, 60))
@@ -77,9 +78,9 @@ class ItemWidget(QWidget):
                 rect = QRect(0,0,340, 60)
                 pi = QPixmap(510, 60)
                 pt = QPainter(pi)
-                pt.setPen("#34495E")
+                pt.setPen(QColor("#34495E"))
                 pt.setRenderHint(QPainter.Antialiasing)
-                pt.fillRect(QRect(0, 0, 510, 60), QBrush("#CBD1D5"))
+                pt.fillRect(QRect(0, 0, 510, 60), QBrush(QColor("#CBD1D5")))
                 pt.drawImage(rect, img.scaled(340,60))
                 pt.drawText(35, 50, text)
                 pt.end()
@@ -96,9 +97,9 @@ class ItemWidget(QWidget):
             rect =QRect(0,0,340,60)
             pix = QPixmap(510, 60)
             pt =QPainter(pix)
-            pt.setPen("#FFFFFF")
+            pt.setPen(QColor("#FFFFFF"))
             pt.setRenderHint(QPainter.Antialiasing)
-            pt.fillRect(QRect(0,0,510, 60), QBrush("#CBD1D5"))
+            pt.fillRect(QRect(0,0,510, 60), QBrush(QColor("#CBD1D5")))
             pt.drawImage(rect,img1.scaled(340,60))
             pt.drawImage(rect,img2.scaled(340,60))
             pt.drawText(35, 50, text)
