@@ -6,11 +6,11 @@ import platform
 
 import sys
 from pathlib import Path
-from PySide6 import QtCore
-from PySide6.QtCore import QUrl,QTranslator,QCoreApplication
-from PySide6.QtGui import QDesktopServices, QPixmap
-from PySide6.QtWidgets import QMessageBox, QFileDialog
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QPushButton, \
+from PyQt5 import QtCore
+from PyQt5.QtCore import QUrl,QTranslator,QCoreApplication
+from PyQt5.QtGui import QDesktopServices, QPixmap
+from PyQt5.QtWidgets import QMessageBox, QFileDialog
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QPushButton, \
      QVBoxLayout, QListWidget, QApplication,QLabel
 import sh
 from config import *

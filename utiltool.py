@@ -8,7 +8,7 @@ import os,sys
 from config import *
 from biplist import *
 
-import wmi
+# import wmi
 # from winreg import *
 # # 1.连接注册表根键，以HKEY_LOCAL_MACHINE为例
 # regRoot = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
@@ -28,7 +28,7 @@ from passlib.hash import sha256_crypt
 
 import base64,platform
 import pyDes
-import images
+import imagesPyQt5
 
 def get_path(p):
     s=p.replace("src","images")

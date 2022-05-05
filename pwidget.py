@@ -6,10 +6,11 @@ import sys
 import random
 from pathlib import Path
 from utiltool import *
-from PySide6.QtWidgets import QPushButton, QWidget,QFileDialog,QLineEdit, QTextBrowser,QMessageBox
-from PySide6.QtGui import QRegularExpressionValidator,QImage,QPainter,QPixmap,QPen
-from PySide6.QtCore import QFile,QRegularExpression, Signal
-from PySide6.QtUiTools import QUiLoader
+from PyQt5.QtWidgets import QPushButton, QWidget,QFileDialog,QLineEdit, QTextBrowser,QMessageBox
+from PyQt5.QtGui import QRegularExpressionValidator,QImage,QPainter,QPixmap,QPen
+from PyQt5.QtCore import QFile,QRegularExpression, pyqtSignal as Signal
+# from PyQt5.QtUiTools import QUiLoader
+from PyQt5 import uic
 
 class PWidget(QWidget):
     importPath = Signal(str)
@@ -93,11 +94,12 @@ class PWidget(QWidget):
         self.msgBox.setInformativeText(self.tr("Please check your input！"))
 
     def load_ui(self):
-        loader = QUiLoader()
+        # loader = QUiLoader()
         path = get_path( "src/form.ui")
         ui_file = QFile(path)
         ui_file.open(QFile.Truncate and QFile.ReadOnly)
-        self.ui = loader.load(ui_file, self)
+        # self.ui = loader.load(ui_file, self)
+        self.ui = uic.loadUi(ui_file, self)
         ui_file.close()
 
     def openFolder(self):
