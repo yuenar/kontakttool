@@ -405,24 +405,24 @@ if __name__ == "__main__":
         #     # os.system(cmd)
         #     # os.system("open -a Terminal .")
         #     applescript.AppleScript('display dialog "程序需要输入用户密码，App need input user password." giving up after 2').run()
-    if os.geteuid() != 0:
-        cmd =get_filename("src/run.sh")
-        elevate()
-        os.system(cmd)
-        # elevate()
-        # # os.system('do shell script "sudo /Applications/kontakt-tool.app/Contents/MacOS/kontakt-tool" with administrator privileges')
-        # applescript.AppleScript('''tell application "Terminal"
-        #                                 activate
-        #                                 set newTab to do shell script "sudo /Applications/kontakt-tool.app/Contents/MacOS/kontakt-tool" with administrator privileges
-        #                              end tell
-        #                         '''
-        #                         ).run()
-        # applescript.AppleScript.call("Terminal",'''
-        #                              activatedo scr
-        #                                 set newTab to ipt "sudo /Applications/kontakt-tool.app/Contents/MacOS/kontakt-tool" with administrator privileges
-        #                         '''
-        #                         )
-        sys.exit(-1)
+    # if os.geteuid() != 0:
+    #     cmd =get_filename("src/run.sh")
+    #     elevate()
+    #     os.system(cmd)
+    #     # elevate()
+    #     # # os.system('do shell script "sudo /Applications/kontakt-tool.app/Contents/MacOS/kontakt-tool" with administrator privileges')
+    #     # applescript.AppleScript('''tell application "Terminal"
+    #     #                                 activate
+    #     #                                 set newTab to do shell script "sudo /Applications/kontakt-tool.app/Contents/MacOS/kontakt-tool" with administrator privileges
+    #     #                              end tell
+    #     #                         '''
+    #     #                         ).run()
+    #     # applescript.AppleScript.call("Terminal",'''
+    #     #                              activatedo scr
+    #     #                                 set newTab to ipt "sudo /Applications/kontakt-tool.app/Contents/MacOS/kontakt-tool" with administrator privileges
+    #     #                         '''
+    #     #                         )
+    #     sys.exit(-1)
 
     # #   计算机的网络名称，’acer-PC’
     # print(platform.node())
